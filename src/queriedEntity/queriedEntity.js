@@ -28,7 +28,7 @@ export default (entityName, {resultField = RESULT_FIELD, hideLoadIfDataFound = t
             {queryEntities, pushToQueue, createEntity, updateEntity, patchEntity, deleteEntity})(
             class extends React.Component {
 
-                static defaultProps = {freeze: () => {}, unfreeze: () => {}};
+                // static defaultProps = {freeze: () => {}, unfreeze: () => {}};
 
                 state = {params: {}, loadingData: false};
 
