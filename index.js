@@ -1,6 +1,10 @@
-import reducer from './src/queriedEntity/queriedEntityReducer';
-import HOC from './src/queriedEntity/queriedEntity';
+'use strict';
 
-export const queriedEntity = HOC;
-export const queriedEntityReducer = reducer;
+var lib = require('./dist/index');
+Object.defineProperty(exports , 'queriedEntityReducer', {
+    value: lib.queriedEntityReducer
+});
 
+Object.defineProperty(exports , 'queriedEntity', {
+    value: lib.queriedEntity
+});
