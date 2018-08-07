@@ -1,11 +1,11 @@
 var path = require('path');
 
 module.exports = {
-    mode: 'development',
+    // mode: 'development',
     entry: './src/index.js',
     output: {
         path: path.resolve(__dirname, 'dist'),
-        filename: 'bundle.js',
+        filename: 'index.js',
         library: 'restredux',
         libraryTarget: 'umd',
     },
@@ -27,6 +27,8 @@ module.exports = {
     externals: {
         axios: 'axios',
         react: 'react',
-        ['react-redux']: 'react-redux'
+        redux: 'redux',
+        ['react-redux']: 'react-redux',
+        ['redux-thunk']: 'redux-thunk'
     }
 };

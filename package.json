@@ -20,7 +20,8 @@
     "axios": "^0.18.0",
     "react": "^16.4.2",
     "react-redux": "^5.0.7",
-    "redux": "^4.0.0"
+    "redux": "^4.0.0",
+    "redux-thunk": "^2.2.0"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0-beta.55",
