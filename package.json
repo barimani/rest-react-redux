@@ -1,6 +1,6 @@
 {
-  "name": "restredux",
-  "version": "0.0.0",
+  "name": "rest-react-redux",
+  "version": "0.0.1",
   "description": "A library that provides higher order components for communicating with a backend server via standard rest API protocol",
   "main": "index.js",
   "scripts": {
@@ -15,7 +15,7 @@
     "rest"
   ],
   "author": "Bari Barimani",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "axios": "^0.18.0",
     "react": "^16.4.2",
