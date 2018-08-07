@@ -22,13 +22,14 @@ const filteredProps = {};
 ['queryEntities', 'pushToQueue', 'createEntity',
     'updateEntity', 'patchEntity', 'deleteEntity'].forEach(prop => filteredProps[prop] = undefined);
 
-export default (entityName, {resultField = RESULT_FIELD, hideLoadIfDataFound = true, retain_number = RETAIN_NUMBER} = {}) =>
+export default (entityName, {resultField = RESULT_FIELD, hideLoadIfDataFound = true,
+    retain_number = RETAIN_NUMBER, reducer_name} = {}) =>
     WrappedComponent =>
-        connect(state => ({[PL(entityName)]: state[PL(entityName)]}),
+        connect(state => ({[PL(entityName)]: state[reducer_name || PL(entityName)]}),
             {queryEntities, pushToQueue, createEntity, updateEntity, patchEntity, deleteEntity})(
             class extends React.Component {
 
-                // static defaultProps = {freeze: () => {}, unfreeze: () => {}};
+                static defaultProps = {freeze: () => {}, unfreeze: () => {}};
 
                 state = {params: {}, loadingData: false};
 
@@ -119,6 +120,7 @@ export default (entityName, {resultField = RESULT_FIELD, hideLoadIfDataFound = t
                     return (
                         <WrappedComponent
                             {...this.props}
+                            {...filteredProps}
                             {...this.state.params}
                             {...injectedProps}
                         />

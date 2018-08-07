@@ -68,20 +68,12 @@ export default (entityName) => WrappedComponent =>
     );
 
 
-
 /**
  * actions
  */
 const insertItem = (payload, entityName) => {
     return {
         type: types.INSERT_ITEM(entityName),
-        payload
-    };
-};
-
-const removeQuery = (payload, entityName) => {
-    return {
-        type: types.REMOVE_ITEM(entityName),
         payload
     };
 };
