@@ -1,7 +1,7 @@
 import React from 'react';
-import axios from "axios";
-import * as types from "./helpers";
 import { connect } from 'react-redux';
+import {getItem, createItem, deleteItem, patchItem, pushToQueue, updateItem} from "./detailedEntityActions";
+import {CFL} from "../queriedEntity/helpers";
 
 /**
  * Detailed entity abstraction (Higher Order Component)
@@ -15,23 +15,41 @@ import { connect } from 'react-redux';
  *    use dynamicURL on the initialQuery. This will override the staticURL if any provided.
  */
 
+const filteredProps = {};
+['getItem', 'pushToQueue', 'createItem', 'updateItem', 'patchItem', 'deleteItem']
+    .forEach(prop => filteredProps[prop] = undefined);
+
 // Number of queries to cache in store
 const RETAIN_NUMBER = 10;
 
 
-export default (entityName) => WrappedComponent =>
-    connect(state => ({[entityName]: state[entityName]}), {getItem})(
+export default (entityName, {reducerName}) => WrappedComponent =>
+    connect(state => ({[entityName]: state[reducerName || entityName]}),
+        {getItem, pushToQueue, createItem, updateItem, patchItem, deleteItem})(
         class extends React.Component {
 
             static defaultProps = {freeze: () => {}, unfreeze: () => {}};
+
             state = {entityId: null, loadingData: false};
 
             initialGet = (url, entityId) => {
                 this.setState({loadingData: true, url, entityId});
+                this.get(url);
+            };
+
+            get = (url = this.state.url) => {
                 this.props.freeze();
+                this.setState({loadingData: true});
                 this.props.getItem(entityName, url,
                     () => {this.setState({loadingData: false});this.props.unfreeze();this.collectGarbage();},
                     () => {this.setState({loadingData: false});this.props.unfreeze();});
+            };
+
+            // Checks whether initialGet is called and url is known
+            checkSetup = () => {
+                const { url, entityId } = this.state;
+                if (!url) throw new Error(`No url specified for ${entityName}`);
+                if (!entityId) throw new Error(`No entityId specified for ${entityName}`);
             };
 
             collectGarbage = () => {
@@ -40,12 +58,34 @@ export default (entityName) => WrappedComponent =>
 
             };
 
-            refetch = () => {
+            // Entity must contain id and the whole properties of the model
+            update = entity => {
+                this.checkSetup();
                 this.props.freeze();
-                this.setState({loadingData: true});
-                this.props.getItem(entityName, this.state.url,
-                    () => {this.setState({loadingData: false});this.props.unfreeze();this.collectGarbage();},
-                    () => {this.setState({loadingData: false});this.props.unfreeze();});
+                this.props.updateItem(entityName, entity, this.state.entityId, this.state.url, () => {
+                    this.props.unfreeze();
+                    this.get()
+                });
+            };
+
+            // The fields to be patched, field should contain id
+            patch = fields => {
+                this.checkSetup();
+                this.props.freeze();
+                this.props.patchEntity(entityName, fields, this.state.entityId, this.state.url, () => {
+                    this.props.unfreeze();
+                    this.get()
+                });
+            };
+
+            // Accepts the entity object that contains id or the id itself as a string
+            delete = () => {
+                this.checkSetup();
+                this.props.freeze();
+                this.props.deleteItem(entityName, this.state.entityId, this.state.url, () => {
+                    this.props.unfreeze();
+                    this.get()
+                });
             };
 
             /** @ignore */
@@ -53,38 +93,23 @@ export default (entityName) => WrappedComponent =>
                 const {entityId} = this.state;
                 const entity = this.props[entityName][entityId];
                 const item = {[entityName]: entity || {}};
+                const injectedProps = {
+                    [entityName]: entity || {},
+                    ['initialGet' + CFL(entityName)]: this.initialGet,
+                    ['get' + CFL(entityName)]: this.get,
+                    ['update' + CFL(entityName)]: this.update,
+                    ['patch' + CFL(entityName)]: this.patch,
+                    ['delete' + CFL(entityName)]: this.delete,
+                    ['loading' + CFL(entityName)]: this.state.loadingData
+                };
                 return (
-                    <div>
-                        <WrappedComponent
-                            {...this.props}
-                            {...item}
-                            initialGet={this.initialGet}
-                            refetch={this.refetch}
-                        />
-                    </div>
+                    <WrappedComponent
+                        {...this.props}
+                        {...filteredProps}
+                        {...item}
+                        {...injectedProps}
+                    />
                 )
             }
         }
     );
-
-
-/**
- * actions
- */
-const insertItem = (payload, entityName) => {
-    return {
-        type: types.INSERT_ITEM(entityName),
-        payload
-    };
-};
-
-const getItem = (entityName, url, onSuccess, onFailure) => {
-    return dispatch => axios.get(url)
-        .then(({data}) => {
-            dispatch(insertItem(data, entityName));
-            onSuccess && onSuccess();
-        })
-        .catch(() => {
-            onFailure && onFailure();
-        });
-};

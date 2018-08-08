@@ -19,8 +19,8 @@ const RESULT_FIELD = 'content';
 
 
 const filteredProps = {};
-['queryEntities', 'pushToQueue', 'createEntity',
-    'updateEntity', 'patchEntity', 'deleteEntity'].forEach(prop => filteredProps[prop] = undefined);
+['queryEntities', 'pushToQueue', 'createItem',
+    'updateItem', 'patchItem', 'deleteItem'].forEach(prop => filteredProps[prop] = undefined);
 
 export default (entityName, {resultField = RESULT_FIELD, hideLoadIfDataFound = true,
     retain_number = RETAIN_NUMBER, reducer_name} = {}) =>
@@ -77,11 +77,11 @@ export default (entityName, {resultField = RESULT_FIELD, hideLoadIfDataFound = t
                     });
                 };
 
-                // The fields to be updated, field should contain id
+                // The fields to be patched, field should contain id
                 patch = fields => {
                     this.checkSetup();
                     this.props.freeze();
-                    this.props.updateEntity(entityName, fields, this.state.url, resultField, () => {
+                    this.props.patchEntity(entityName, fields, this.state.url, resultField, () => {
                         this.props.unfreeze();
                         this.query()
                     });
