@@ -1,4 +1,4 @@
-import {detailedUrl, encodeParams} from "./helpers";
+import {detailedUrl, encodeAPICall} from "./helpers";
 import axios from "axios";
 import * as types from "./helpers";
 
@@ -37,7 +37,7 @@ const deleteEntityDispatch = (payload, entityName) => {
 export const queryEntities = (entityName, url, params, onSuccess, onFailure) => {
     return dispatch => axios.get(url, {params})
         .then(({data}) => {
-            dispatch(insertQuery({...data, query: encodeParams(params)}, entityName));
+            dispatch(insertQuery({...data, query: encodeAPICall(url, params)}, entityName));
             onSuccess && onSuccess();
         })
         .catch(() => {

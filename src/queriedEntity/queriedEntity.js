@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import {encodeParams, PL} from "./helpers";
+import {encodeAPICall, PL} from "./helpers";
 import {CFL} from "./helpers";
 import {queryEntities, pushToQueue, createEntity, updateEntity, patchEntity, deleteEntity} from './queriedEntityActions';
 
@@ -44,10 +44,10 @@ export default (entityName, {resultField = RESULT_FIELD, hideLoadIfDataFound = t
                     const oldParams = {...this.state.params};
                     const newParams = {...oldParams, ...params};
                     this.setState({params: newParams, loadingData: true});
-                    const dataExists = !!this.props[PL(entityName)][encodeParams(newParams)];
+                    const dataExists = !!this.props[PL(entityName)][encodeAPICall(url, newParams)];
                     if (!dataExists || !hideLoadIfDataFound) this.props.freeze();
                     this.props.queryEntities(entityName, url, newParams,
-                        () => {this.setState({loadingData: false});this.props.unfreeze();this.collectGarbage(newParams);},
+                        () => {this.setState({loadingData: false});this.props.unfreeze();this.collectGarbage(url, newParams);},
                         () => {this.setState({loadingData: false, params: oldParams});this.props.unfreeze();});
                 };
 
@@ -99,11 +99,11 @@ export default (entityName, {resultField = RESULT_FIELD, hideLoadIfDataFound = t
                 };
 
                 // Garbage collector so the redux storage will not blow up!
-                collectGarbage = params => this.props.pushToQueue(entityName, encodeParams(params), retain_number);
+                collectGarbage = (url, params) => this.props.pushToQueue(entityName, encodeAPICall(url, params), retain_number);
 
                 render() {
-                    const {params} = this.state;
-                    const queryData = this.props[PL(entityName)][encodeParams(params)] || {};
+                    const {url, params} = this.state;
+                    const queryData = this.props[PL(entityName)][encodeAPICall(url, params)] || {};
                     const queryMetadata = resultField ? {...queryData} : undefined;
                     if (resultField) delete queryMetadata[resultField];
                     const injectedProps = {

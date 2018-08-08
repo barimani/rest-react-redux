@@ -6,11 +6,22 @@ export const PATCH_ENTITY = entityName => 'PATCH_ENTITY_' + entityName.toUpperCa
 export const DELETE_ENTITY = entityName => 'DELETE_ENTITY_' + entityName.toUpperCase();
 
 // Generates a unique key from the params objects
-export const encodeParams = (params) => {
+export const encodeAPICall = (url, params) => {
     const sortedParams = {};
     Object.keys(params).sort().forEach(key => sortedParams[key] = params[key]);
     const string = JSON.stringify(sortedParams);
-    return string.replace(/["{}]/g, '').replace(/,/g, '-');
+    return hashCode(url + string);
+};
+
+const hashCode = string => {
+        let hash = 0;
+        if (string.length === 0) return hash;
+        for (let i = 0; i < string.length; i++) {
+            const char = string.charCodeAt(i);
+            hash = ((hash << 5) - hash) + char;
+            hash = hash & hash; // Convert to 32bit integer
+        }
+        return hash;
 };
 
 // Capitalizes first letter
