@@ -1,4 +1,4 @@
-## Rest Redux
+## Rest React Redux
 
 A higher order component RestAPI abstraction. Reduces lots of boilerplate code and encourages clean code.
 
