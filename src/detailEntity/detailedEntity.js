@@ -23,7 +23,7 @@ const filteredProps = {};
 const RETAIN_NUMBER = 10;
 
 
-export default (entityName, {reducerName}) => WrappedComponent =>
+export default (entityName, {reducerName} = {}) => WrappedComponent =>
     connect(state => ({[entityName]: state[reducerName || entityName]}),
         {getItem, pushToQueue, createItem, updateItem, patchItem, deleteItem})(
         class extends React.Component {
@@ -72,7 +72,7 @@ export default (entityName, {reducerName}) => WrappedComponent =>
             patch = fields => {
                 this.checkSetup();
                 this.props.freeze();
-                this.props.patchEntity(entityName, fields, this.state.entityId, this.state.url, () => {
+                return this.props.patchItem(entityName, fields, this.state.entityId, this.state.url, () => {
                     this.props.unfreeze();
                     this.get()
                 });

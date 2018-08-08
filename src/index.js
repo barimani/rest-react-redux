@@ -1,6 +1,11 @@
-import reducer from './queriedEntity/queriedEntityReducer';
-import HOC from './queriedEntity/queriedEntity';
+import qer from './queriedEntity/queriedEntityReducer';
+import qe from './queriedEntity/queriedEntity';
+import der from './detailEntity/detailedEntityReducer';
+import de from './detailEntity/detailedEntity';
 
-export const queriedEntity = HOC;
-export const queriedEntityReducer = reducer;
+export const queriedEntityReducer = qer;
+export const queriedEntity = qe;
+export const detailedEntityReducer = der;
+export const detailedEntity = de;
+
 

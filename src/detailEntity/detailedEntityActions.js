@@ -1,4 +1,3 @@
-import {detailedUrl, encodeParams} from "./helpers";
 import axios from "axios";
 import * as types from "./helpers";
 
@@ -77,11 +76,10 @@ export const updateItem = (entityName, entity, entityId, url, onSuccess, onFailu
 };
 
 export const patchItem = (entityName, entity, entityId, url, onSuccess, onFailure) => {
-    if (!entity.id) throw new Error(`Entity ${entityName} does not have id to patch`);
     return dispatch => axios.patch(url, entity)
         .then(() => {
-            dispatch(patchItemDispatch({entity, entityId}, entityName));
             onSuccess && onSuccess();
+            dispatch(patchItemDispatch({entity, entityId}, entityName));
         }).catch((e) => {
             onFailure && onFailure();
             console.log(e);

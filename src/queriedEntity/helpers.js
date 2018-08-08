@@ -1,6 +1,6 @@
 /** Queried entity actions **/
 export const INSERT_QUERY = entityName => 'INSERT_QUERY_' + entityName.toUpperCase();
-export const PUSH_TO_TRACKING_QUEUE = entityName => 'PUSH_TO_TRACKING_QUEUE_' + entityName.toUpperCase();
+export const PUSH_TO_TRACKING_QUEUE = entityName => 'PUSH_TO_TRACKING_QUEUE_QUERY_' + entityName.toUpperCase();
 export const UPDATE_ENTITY = entityName => 'UPDATE_ENTITY_' + entityName.toUpperCase();
 export const PATCH_ENTITY = entityName => 'PATCH_ENTITY_' + entityName.toUpperCase();
 export const DELETE_ENTITY = entityName => 'DELETE_ENTITY_' + entityName.toUpperCase();
