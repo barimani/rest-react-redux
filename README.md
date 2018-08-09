@@ -21,8 +21,8 @@ What you need to do:
 - Enjoy the props introduced to your component and not ever worry about writing actions and reducers
 
 This library is supposed to be used only on a restful endpoint. here is an example:
-- *GET*:  http//:www.url.com/contacts?page=1&page-size=10 returns a list of contacts and metadata about the query
-- *POST*:  http//:www.url.com/contacts creates a contact
+- *GET*:  `http://www.url.com/contacts?page=1&page-size=10` returns a list of contacts and metadata about the query
+- *POST*:  `http://www.url.com/contacts` creates a contact
 - *GET*, *PUT*, *PATCH*: http:www.url.com/contacts/contactId: gets, updates or patches the specific contanct respectively
 
 ## Restrictions in the current version
@@ -42,8 +42,8 @@ axios.defaults.baseURL = 'http//:www.url.com';
 ```js
 import { queriedEntityReducer, detailedEntityReducer } from 'rest-react-redux';
 const reducers = {
-    projects: queriedEntityReducer('project'),
-    project: detailedEntityReducer('project'),
+    contacts: queriedEntityReducer('contact'),
+    contact: detailedEntityReducer('contact'),
 }
 ```
 
@@ -84,6 +84,17 @@ NOTE: For those of you who do not enjoy decorating as much as I do, use the stan
 | delete[EntityName] | Removes an entity. After success, will update the store and queries again  | `deleteContact({id: 1, name: 'Foo Bar'})` |
 | loading[EntityName]s | Network loading status  | `loadingContacts` | `true` |
 
+### queriedEntity
+
+if you intend to work with an endpoint that returns a detailed entity use `detailedEntity` to decorate your components:
+```js
+import { detailedEntity } from 'rest-react-redux';
+
+@detailedEntity('contact')
+class ContactsPage extends React.Component {
+    ...
+}
+```
 ### detailedEntity(entityName, config[optional])
 
 | Config field | Explanation | Default Value |
@@ -114,6 +125,3 @@ License
 ----
 
 MIT
-
-
-**Free Software, Hell Yeah!**
