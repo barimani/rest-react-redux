@@ -23,17 +23,17 @@ What you need to do:
 This library is supposed to be used only on a restful endpoint. here is an example:
 - *GET*:  `http://www.url.com/contacts?page=1&page-size=10` returns a list of contacts and metadata about the query
 - *POST*:  `http://www.url.com/contacts` creates a contact
-- *GET*, *PUT*, *PATCH*: http:www.url.com/contacts/contactId: gets, updates or patches the specific contanct respectively
+- *GET*, *PUT*, *PATCH*: `http://www.url.com/contacts/contactId` gets, updates or patches the specific contact respectively
 
 ## Restrictions in the current version
 - Json endpoints: network request and response body must be in JSON
-- redux thunk: your application redux store must contain redux-thunk as middleware
+- Redux-thunk: your application redux store must contain redux-thunk as middleware
 ```js
 import {createStore, compose, applyMiddleware} from 'redux';
 import thunk from 'redux-thunk';
 export const store = createStore(rootReducer, compose(applyMiddleware(thunk)));
 ```
-- Axios your application must use axios as the network call library. BaseUrl and headers must be set in your application scope
+- Axios: your application must use axios as the network call library. BaseUrl and headers must be set in your application scope
 ```js
 import axios from 'axios';
 axios.defaults.baseURL = 'http//:www.url.com';
