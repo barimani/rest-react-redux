@@ -19,8 +19,8 @@ const RESULT_FIELD = 'content';
 
 
 const filteredProps = {};
-['queryEntities', 'pushToQueue', 'createItem',
-    'updateItem', 'patchItem', 'deleteItem'].forEach(prop => filteredProps[prop] = undefined);
+['queryEntities', 'pushToQueue', 'createEntity',
+    'updateEntity', 'patchEntity', 'deleteEntity'].forEach(prop => filteredProps[prop] = undefined);
 
 export default (entityName, {resultField = RESULT_FIELD, hideLoadIfDataFound = true,
     retain_number = RETAIN_NUMBER, reducer_name} = {}) =>
@@ -107,6 +107,7 @@ export default (entityName, {resultField = RESULT_FIELD, hideLoadIfDataFound = t
                     const queryMetadata = resultField ? {...queryData} : undefined;
                     if (resultField) delete queryMetadata[resultField];
                     const injectedProps = {
+                        [PL(entityName) + 'QueryParams']: this.state.params,
                         [PL(entityName)]: (resultField ? (queryData && queryData[resultField]) : queryData) || [],
                         [PL(entityName) + 'Metadata']: queryMetadata,
                         ['initialQuery' + CFL(PL(entityName))]: this.initialQuery,
@@ -115,13 +116,12 @@ export default (entityName, {resultField = RESULT_FIELD, hideLoadIfDataFound = t
                         ['update' + CFL(entityName)]: this.update,
                         ['patch' + CFL(entityName)]: this.patch,
                         ['delete' + CFL(entityName)]: this.delete,
-                        ['loading' + CFL(PL(entityName))]: this.state.loadingData
+                        ['loading' + CFL(PL(entityName))]: this.state.loadingData,
                     };
                     return (
                         <WrappedComponent
                             {...this.props}
                             {...filteredProps}
-                            {...this.state.params}
                             {...injectedProps}
                         />
                     )
