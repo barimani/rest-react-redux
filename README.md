@@ -73,7 +73,7 @@ NOTE: For those of you who do not enjoy decorating as much as I do, use the stan
 #### Properties injected to the wrapped component
 | property (props) | Explanation | Example | Sample value |
 | ------ | ------ | ------ | ------ |
-| [entityName]s | The query result | `contacts` | `[{id: 1, name: 'John Doe']` |
+| [entityName]s | The query result | `contacts` | `[{id: 1, name: 'John Doe'}]` |
 | [entityName]sQueryParams | The last successful parameters with which query was performed | `contactsQueryParams` | `{page: 1}` |
 | [entityName]sMetadata | The metadata that is received from the endpoint | `contactsMetadata` | `{totalPages: 10}` |
 | initialQuery[entityName]s | A *must-be-called* function that initializes the query. Receives url and parameters (object) | `initialQueryContacts('/contacts/', {page: 1})` |
