@@ -40,6 +40,6 @@ export const PL = word => {
 
 // Appends id after the base url
 export const detailedUrl = (baseUrl, id) => {
-    const hasSlash = baseUrl.endsWith('/');
-    return baseUrl + (!hasSlash ? '/' : '') + id;
+    const hasTrailingSlash = baseUrl.endsWith('/');
+    return baseUrl + (!hasTrailingSlash ? '/' : '') + id + (hasTrailingSlash ? '/' : '');
 };

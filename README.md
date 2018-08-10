@@ -36,7 +36,7 @@ export const store = createStore(rootReducer, compose(applyMiddleware(thunk)));
 - Axios: your application must use axios as the network call library. BaseUrl and headers must be set in your application scope
 ```js
 import axios from 'axios';
-axios.defaults.baseURL = 'http//:www.url.com';
+axios.defaults.baseURL = 'http://www.url.com';
 ```
 - reducer: using `queriedEntityReducer` or `detailedEntityReducer` you must create a field in the root reducer matching the name of the entity you create. This is where the library manages the data
 ```js

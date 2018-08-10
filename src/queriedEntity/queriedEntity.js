@@ -36,7 +36,7 @@ export default (entityName, {resultField = RESULT_FIELD, hideLoadIfDataFound = t
                 // Sets up the query and makes the initial query
                 initialQuery = (url, params = {}) => {
                     this.setState({url});
-                    this.query(params, url);
+                    return this.query(params, url);
                 };
 
                 // Queries with the params, will construct query params based on the old ones and new ones
@@ -46,7 +46,7 @@ export default (entityName, {resultField = RESULT_FIELD, hideLoadIfDataFound = t
                     this.setState({params: newParams, loadingData: true});
                     const dataExists = !!this.props[PL(entityName)][encodeAPICall(url, newParams)];
                     if (!dataExists || !hideLoadIfDataFound) this.props.freeze();
-                    this.props.queryEntities(entityName, url, newParams,
+                    return this.props.queryEntities(entityName, url, newParams,
                         () => {this.setState({loadingData: false});this.props.unfreeze();this.collectGarbage(url, newParams);},
                         () => {this.setState({loadingData: false, params: oldParams});this.props.unfreeze();});
                 };
@@ -61,7 +61,7 @@ export default (entityName, {resultField = RESULT_FIELD, hideLoadIfDataFound = t
                 create = entity => {
                     this.checkSetup();
                     this.props.freeze();
-                    this.props.createEntity(entityName, entity, this.state.url, () => {
+                    return this.props.createEntity(entityName, entity, this.state.url, () => {
                         this.props.unfreeze();
                         this.query()
                     });
@@ -71,7 +71,7 @@ export default (entityName, {resultField = RESULT_FIELD, hideLoadIfDataFound = t
                 update = entity => {
                     this.checkSetup();
                     this.props.freeze();
-                    this.props.updateEntity(entityName, entity, this.state.url, resultField, () => {
+                    return this.props.updateEntity(entityName, entity, this.state.url, resultField, () => {
                         this.props.unfreeze();
                         this.query()
                     });
@@ -81,7 +81,7 @@ export default (entityName, {resultField = RESULT_FIELD, hideLoadIfDataFound = t
                 patch = fields => {
                     this.checkSetup();
                     this.props.freeze();
-                    this.props.patchEntity(entityName, fields, this.state.url, resultField, () => {
+                    return this.props.patchEntity(entityName, fields, this.state.url, resultField, () => {
                         this.props.unfreeze();
                         this.query()
                     });
@@ -92,7 +92,7 @@ export default (entityName, {resultField = RESULT_FIELD, hideLoadIfDataFound = t
                     this.checkSetup();
                     if (typeof entity === 'string') entity = {id: entity};
                     this.props.freeze();
-                    this.props.deleteEntity(entityName, entity, this.state.url, resultField, () => {
+                    return this.props.deleteEntity(entityName, entity, this.state.url, resultField, () => {
                         this.props.unfreeze();
                         this.query()
                     });

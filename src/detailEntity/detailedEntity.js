@@ -34,13 +34,13 @@ export default (entityName, {reducerName} = {}) => WrappedComponent =>
 
             initialGet = (url, entityId) => {
                 this.setState({loadingData: true, url, entityId});
-                this.get(url);
+                return this.get(url);
             };
 
             get = (url = this.state.url) => {
                 this.props.freeze();
                 this.setState({loadingData: true});
-                this.props.getItem(entityName, url,
+                return this.props.getItem(entityName, url,
                     () => {this.setState({loadingData: false});this.props.unfreeze();this.collectGarbage();},
                     () => {this.setState({loadingData: false});this.props.unfreeze();});
             };
@@ -62,7 +62,7 @@ export default (entityName, {reducerName} = {}) => WrappedComponent =>
             update = entity => {
                 this.checkSetup();
                 this.props.freeze();
-                this.props.updateItem(entityName, entity, this.state.entityId, this.state.url, () => {
+                return this.props.updateItem(entityName, entity, this.state.entityId, this.state.url, () => {
                     this.props.unfreeze();
                     this.get()
                 });
@@ -82,7 +82,7 @@ export default (entityName, {reducerName} = {}) => WrappedComponent =>
             delete = () => {
                 this.checkSetup();
                 this.props.freeze();
-                this.props.deleteItem(entityName, this.state.entityId, this.state.url, () => {
+                return this.props.deleteItem(entityName, this.state.entityId, this.state.url, () => {
                     this.props.unfreeze();
                     this.get()
                 });
