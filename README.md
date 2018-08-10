@@ -76,8 +76,8 @@ NOTE: For those of you who do not enjoy decorating as much as I do, use the stan
 | [entityName]s | The query result | `contacts` | `[{id: 1, name: 'John Doe'}]` |
 | [entityName]sQueryParams | The last successful parameters with which query was performed | `contactsQueryParams` | `{page: 1}` |
 | [entityName]sMetadata | The metadata that is received from the endpoint | `contactsMetadata` | `{totalPages: 10}` |
-| initialQuery[entityName]s | A *must-be-called* function that initializes the query. Receives url and parameters (object) | `initialQueryContacts('/contacts/', {page: 1})` |
-| query[entityName]s | Any query after initial query call. It will append the new params on top of the previous ones  | `queryContacts({pageSize: 1})` |
+| initialQuery[EntityName]s | A *must-be-called* function that initializes the query. Receives url and parameters (object) | `initialQueryContacts('/contacts/', {page: 1})` |
+| query[EntityName]s | Any query after initial query call. It will append the new params on top of the previous ones  | `queryContacts({pageSize: 1})` |
 | create[EntityName] | Creates an object and performs the latest query again  | `createContact({name: 'Foo Bar'})` |
 | update[EntityName] | Updates/replaces an entity. After success, will update the store and queries again  | `updateContact({id: 1, name: 'Foo Bar'})` |
 | patch[EntityName] | Patches an entity. After success, will update the store and queries again  | `patchContact({id: 1, name: 'Foo Bar'})` |
@@ -107,8 +107,8 @@ class ContactsPage extends React.Component {
 | property (props) | Explanation | Example | Sample value |
 | ------ | ------ | ------ | ------ |
 | [entityName] | The result | `contact` | `{id: 1, name: 'John Doe'}` |
-| initialGet[entityName]s | A *must-be-called* function that initializes the entity. Receives url and object id | `initialGetContacts('/contacts/12', 12)` |
-| get[entityName] | Any get call after the initial get call. This is usually used for receiving updates if any  | `getContact()` |
+| initialGet[EntityName]s | A *must-be-called* function that initializes the entity. Receives url and object id | `initialGetContacts('/contacts/12', 12)` |
+| get[EntityName] | Any get call after the initial get call. This is usually used for receiving updates if any  | `getContact()` |
 | update[EntityName] | Updates/replaces the entity. After success, will update the store and gets again  | `updateContact({id: 1, name: 'Foo Bar'})` |
 | patch[EntityName] | Patches the entity. After success, will update the store and gets again  | `patchContact({id: 1, name: 'Foo Bar'})` |
 | delete[EntityName] | Removes the entity. After success, will update the store | `deleteContact({id: 1, name: 'Foo Bar'})` |

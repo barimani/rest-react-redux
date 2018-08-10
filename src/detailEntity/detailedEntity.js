@@ -23,7 +23,7 @@ const filteredProps = {};
 const RETAIN_NUMBER = 10;
 
 
-export default (entityName, {reducerName} = {}) => WrappedComponent =>
+export default (entityName, {reducerName, retain_number = RETAIN_NUMBER} = {}) => WrappedComponent =>
     connect(state => ({[entityName]: state[reducerName || entityName]}),
         {getItem, pushToQueue, createItem, updateItem, patchItem, deleteItem})(
         class extends React.Component {
@@ -52,11 +52,8 @@ export default (entityName, {reducerName} = {}) => WrappedComponent =>
                 if (!entityId) throw new Error(`No entityId specified for ${entityName}`);
             };
 
-            collectGarbage = () => {
-
-                // TODO garbage collection should be smarter, here is only a naive implementation
-
-            };
+            // Garbage collector so the redux storage will not blow up!
+            collectGarbage = () => this.props.pushToQueue(entityName, this.state.entityId, retain_number);
 
             // Entity must contain id and the whole properties of the model
             update = entity => {

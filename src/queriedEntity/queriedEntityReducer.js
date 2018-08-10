@@ -2,11 +2,15 @@ import * as types from './helpers';
 
 const defaultState = {tracker: []};
 
+/**
+ * Reducer generator for storing and to caching queried entities
+ */
 export default entityName => (state = defaultState, action) => {
     switch (action.type) {
         case (types.INSERT_QUERY(entityName)): {
             return {...state, [action.payload.query]: action.payload};
         }
+
         case (types.PUSH_TO_TRACKING_QUEUE(entityName)): {
             let tracker = [...state.tracker];
             const {key, retain_number} = action.payload;
@@ -17,7 +21,7 @@ export default entityName => (state = defaultState, action) => {
                 tracker.shift();
             }
             tracker.push(key);
-            return {...state, tracker: [...tracker]};
+            return {...state, tracker};
         }
 
         case (types.UPDATE_ENTITY(entityName)): {

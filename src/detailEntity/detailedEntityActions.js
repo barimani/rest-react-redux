@@ -46,10 +46,10 @@ export const getItem = (entityName, url, onSuccess, onFailure) => {
         });
 };
 
-export const pushToQueue = (entityName, key, retain_number) => {
+export const pushToQueue = (entityName, id, retain_number) => {
     return {
-        type: types.PUSH_TO_TRACKING_QUEUE(entityName),
-        payload: {key, retain_number}
+        type: types.PUSH_TO_TRACKING_QUEUE_DETAILED(entityName),
+        payload: {id, retain_number}
     };
 };
 
