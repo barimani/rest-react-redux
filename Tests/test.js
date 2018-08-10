@@ -1,5 +1,5 @@
 // import React from 'react';
-const expect = require('chai').expect;
+import {expect} from 'chai';
 // import { shallow } from 'enzyme';
 
 // const Component = () => <div>hi</div>;

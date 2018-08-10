@@ -5,7 +5,7 @@
   "homepage": "https://github.com/barimani/Rest-React-Redux",
   "main": "index.js",
   "scripts": {
-    "test": "mocha ./Tests/test.js",
+    "test": "mocha ./Tests/test.js  --compilers js:@babel/core",
     "build": "webpack"
   },
   "keywords": [
