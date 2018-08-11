@@ -69,7 +69,9 @@ describe('Sanity', () => {
     });
 
     it('can fully mount App in JSDOM environment', () => {
-        const wrapped = mount(<App/>);
-        expect(wrapped.find('Component').find('div')).to.have.length(1);
+        const wrapped = mount(<App/>).find('ContactDetail');
+        expect(wrapped.find('div')).to.have.length(1);
+        expect(wrapped.props()).to.have.property('getContact');
+        expect(wrapped.props()).to.have.property('updateContact');
     });
 });
