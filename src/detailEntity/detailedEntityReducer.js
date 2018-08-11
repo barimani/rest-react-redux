@@ -13,7 +13,7 @@ export default entityName => function itemDetailRepo(state = defaultState, actio
         }
         case types.UPDATE_ITEM(entityName): {
             const {entity, entityId} = action.payload;
-            return {...state, [entityId]: entity};
+            return {...state, [entityId]: {id: entityId, ...entity}};
         }
         case types.PATCH_ITEM(entityName): {
             const {entity, entityId} = action.payload;

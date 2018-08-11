@@ -5,7 +5,7 @@
   "homepage": "https://github.com/barimani/Rest-React-Redux",
   "main": "index.js",
   "scripts": {
-    "test": "mocha ./Tests/test.js  --compilers js:@babel/register",
+    "test": "mocha --compilers js:@babel/register",
     "build": "webpack"
   },
   "keywords": [
@@ -31,6 +31,7 @@
     "@babel/preset-env": "^7.0.0-beta.55",
     "@babel/preset-react": "^7.0.0-beta.55",
     "@babel/register": "^7.0.0-rc.1",
+    "axios-mock-adapter": "^1.15.0",
     "babel-loader": "^8.0.0-beta.4",
     "babel-plugin-transform-class-properties": "^6.24.1",
     "babel-preset-es2015-no-commonjs": "0.0.2",
