@@ -23,7 +23,7 @@ What you need to do:
 This library is supposed to be used only on a restful endpoint. here is an example:
 - *GET*:  `http://www.url.com/contacts?page=1&page-size=10` returns a list of contacts and metadata about the query
 - *POST*:  `http://www.url.com/contacts` creates a contact
-- *GET*, *PUT*, *PATCH*: `http://www.url.com/contacts/contactId` gets, updates or patches the specific contact respectively
+- *GET*, *PUT*, *PATCH* and *DELETE*: `http://www.url.com/contacts/contactId` gets, updates or patches the specific contact respectively
 
 ## Restrictions in the current version
 - Json endpoints: network request and response body must be in JSON
