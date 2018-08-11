@@ -13,7 +13,7 @@ const configureAxiosMockAdapter = () => {
     const mock = new MockAdapter(axios);
 
 
-    let contacts = [{id: '1', name: 'Bari'}, {id: '2', name: 'Mani'}];
+    let contacts = [{id: '1', name: 'Name1'}, {id: '2', name: 'Name2'}, {id: '3', name: 'Name3'}];
 
     /**
      * Mocking Authentication/Evaluation/Registration flow

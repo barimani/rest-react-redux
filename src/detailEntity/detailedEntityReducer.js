@@ -21,7 +21,13 @@ export default entityName => function itemDetailRepo(state = defaultState, actio
         }
         case types.REMOVE_ITEM(entityName): {
             const entityId = action.payload;
-            return {...state, [entityId]: undefined};
+            const tracker = [...state.tracker];
+            const index = tracker.indexOf(entityId);
+            if (index > -1) {
+                delete state[tracker[index]];
+                tracker.splice(index, 1);
+            }
+            return {...state, tracker};
         }
         case (types.PUSH_TO_TRACKING_QUEUE_DETAILED(entityName)): {
             const tracker = [...state.tracker];
