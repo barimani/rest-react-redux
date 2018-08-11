@@ -1,4 +1,4 @@
-import * as types from './helpers';
+import * as types from '../helpers';
 
 const defaultState = {tracker: []};
 

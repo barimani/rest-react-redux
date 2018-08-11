@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import {getItem, createItem, deleteItem, patchItem, pushToQueue, updateItem} from "./detailedEntityActions";
-import {CFL} from "../queriedEntity/helpers";
+import {CFL} from "../helpers";
 
 /**
  * Detailed entity abstraction (Higher Order Component)
@@ -15,6 +15,7 @@ import {CFL} from "../queriedEntity/helpers";
  *    use dynamicURL on the initialQuery. This will override the staticURL if any provided.
  */
 
+// These props should be filtered before inject
 const filteredProps = {};
 ['getItem', 'pushToQueue', 'createItem', 'updateItem', 'patchItem', 'deleteItem']
     .forEach(prop => filteredProps[prop] = undefined);
@@ -40,9 +41,9 @@ export default (entityName, {reducerName, retain_number = RETAIN_NUMBER} = {}) =
             get = (url = this.state.url) => {
                 this.props.freeze();
                 this.setState({loadingData: true});
-                return this.props.getItem(entityName, url,
-                    () => {this.setState({loadingData: false});this.props.unfreeze();this.collectGarbage();},
-                    () => {this.setState({loadingData: false});this.props.unfreeze();});
+                return this.props.getItem(entityName, url)
+                    .then(() => {this.setState({loadingData: false});this.props.unfreeze();this.collectGarbage();})
+                    .catch(() => {this.setState({loadingData: false});this.props.unfreeze();});
             };
 
             // Checks whether initialGet is called and url is known
@@ -59,30 +60,33 @@ export default (entityName, {reducerName, retain_number = RETAIN_NUMBER} = {}) =
             update = entity => {
                 this.checkSetup();
                 this.props.freeze();
-                return this.props.updateItem(entityName, entity, this.state.entityId, this.state.url, () => {
-                    this.props.unfreeze();
-                    this.get()
-                });
+                return this.props.updateItem(entityName, entity, this.state.entityId, this.state.url)
+                    .then(() => {
+                        this.props.unfreeze();
+                        this.get();
+                    });
             };
 
             // The fields to be patched, field should contain id
             patch = fields => {
                 this.checkSetup();
                 this.props.freeze();
-                return this.props.patchItem(entityName, fields, this.state.entityId, this.state.url, () => {
-                    this.props.unfreeze();
-                    this.get()
-                });
+                return this.props.patchItem(entityName, fields, this.state.entityId, this.state.url)
+                    .then(() => {
+                        this.props.unfreeze();
+                        this.get();
+                    });
             };
 
             // Accepts the entity object that contains id or the id itself as a string
             delete = () => {
                 this.checkSetup();
                 this.props.freeze();
-                return this.props.deleteItem(entityName, this.state.entityId, this.state.url, () => {
-                    this.props.unfreeze();
-                    this.get()
-                });
+                return this.props.deleteItem(entityName, this.state.entityId, this.state.url)
+                    .then(() => {
+                        this.props.unfreeze();
+                        this.get();
+                    });
             };
 
             /** @ignore */

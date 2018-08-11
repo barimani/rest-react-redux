@@ -1,10 +1,9 @@
 import axios from "axios";
-import * as types from "./helpers";
+import * as types from "../helpers";
 
 /**
  * Actions
  */
-
 const updateItemDispatch = (payload, entityName) => {
     return {
         type: types.UPDATE_ITEM(entityName),
@@ -35,15 +34,10 @@ const insertItem = (payload, entityName) => {
     };
 };
 
-export const getItem = (entityName, url, onSuccess, onFailure) => {
-    return dispatch => axios.get(url)
-        .then(({data}) => {
-            dispatch(insertItem(data, entityName));
-            onSuccess && onSuccess();
-        })
-        .catch(() => {
-            onFailure && onFailure();
-        });
+export const getItem = (entityName, url) => {
+    return dispatch => axios.get(url).then(({data}) => {
+        dispatch(insertItem(data, entityName));
+    });
 };
 
 export const pushToQueue = (entityName, id, retain_number) => {
@@ -53,46 +47,26 @@ export const pushToQueue = (entityName, id, retain_number) => {
     };
 };
 
-export const createItem = (entityName, entity, url, onSuccess, onFailure) => {
-    return dispatch => axios.post(url, entity)
-        .then(() => {
-            // The returned data will not be of any special use since the position it is placed in db is unknown
-            // therefore no dispatch is made to store
-            onSuccess && onSuccess();
-        }).catch(() => {
-            onFailure && onFailure();
-        });
+export const createItem = (entityName, entity, url) => {
+    // The returned data will not be of any special use since the position it is placed in db is unknown
+    // therefore no dispatch is made to store
+    return () => axios.post(url, entity);
 };
 
-export const updateItem = (entityName, entity, entityId, url, onSuccess, onFailure) => {
-    return dispatch => axios.put(url, entity)
-        .then(({}) => {
-            dispatch(updateItemDispatch({entityId, entity}, entityName));
-            onSuccess && onSuccess();
-        }).catch((e) => {
-            onFailure && onFailure();
-            console.log(e);
-        });
+export const updateItem = (entityName, entity, entityId, url) => {
+    return dispatch => axios.put(url, entity).then(() => {
+        dispatch(updateItemDispatch({entityId, entity}, entityName));
+    });
 };
 
-export const patchItem = (entityName, entity, entityId, url, onSuccess, onFailure) => {
-    return dispatch => axios.patch(url, entity)
-        .then(() => {
-            onSuccess && onSuccess();
-            dispatch(patchItemDispatch({entity, entityId}, entityName));
-        }).catch((e) => {
-            onFailure && onFailure();
-            console.log(e);
-        });
+export const patchItem = (entityName, entity, entityId, url) => {
+    return dispatch => axios.patch(url, entity).then(() => {
+        dispatch(patchItemDispatch({entity, entityId}, entityName));
+    });
 };
 
-export const deleteItem = (entityName, entityId, url, onSuccess, onFailure) => {
-    return dispatch => axios.delete(url)
-        .then(() => {
-            dispatch(deleteItemDispatch(entityId, entityName));
-            onSuccess && onSuccess();
-        }).catch((e) => {
-            onFailure && onFailure();
-            console.log(e);
-        });
+export const deleteItem = (entityName, entityId, url) => {
+    return dispatch => axios.delete(url).then(() => {
+        dispatch(deleteItemDispatch(entityId, entityName));
+    });
 };

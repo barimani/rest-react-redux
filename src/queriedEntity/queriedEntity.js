@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import {encodeAPICall, PL} from "./helpers";
-import {CFL} from "./helpers";
+import {encodeAPICall, PL} from "../helpers";
+import {CFL} from "../helpers";
 import {queryEntities, pushToQueue, createEntity, updateEntity, patchEntity, deleteEntity} from './queriedEntityActions';
 
 /**
@@ -17,7 +17,7 @@ const RETAIN_NUMBER = 10;
 // Default field that maps the results in the response body, if set to null, the whole response will be returned;
 const RESULT_FIELD = 'content';
 
-
+// These props should be filtered before inject
 const filteredProps = {};
 ['queryEntities', 'pushToQueue', 'createEntity',
     'updateEntity', 'patchEntity', 'deleteEntity'].forEach(prop => filteredProps[prop] = undefined);
@@ -46,9 +46,9 @@ export default (entityName, {resultField = RESULT_FIELD, hideLoadIfDataFound = t
                     this.setState({params: newParams, loadingData: true});
                     const dataExists = !!this.props[PL(entityName)][encodeAPICall(url, newParams)];
                     if (!dataExists || !hideLoadIfDataFound) this.props.freeze();
-                    return this.props.queryEntities(entityName, url, newParams,
-                        () => {this.setState({loadingData: false});this.props.unfreeze();this.collectGarbage(url, newParams);},
-                        () => {this.setState({loadingData: false, params: oldParams});this.props.unfreeze();});
+                    return this.props.queryEntities(entityName, url, newParams)
+                        .then(() => {this.setState({loadingData: false});this.props.unfreeze();this.collectGarbage(url, newParams);})
+                        .catch(() => {this.setState({loadingData: false, params: oldParams});this.props.unfreeze();});
                 };
 
                 // Checks whether initialQuery is called and url is known
@@ -61,30 +61,33 @@ export default (entityName, {resultField = RESULT_FIELD, hideLoadIfDataFound = t
                 create = entity => {
                     this.checkSetup();
                     this.props.freeze();
-                    return this.props.createEntity(entityName, entity, this.state.url, () => {
-                        this.props.unfreeze();
-                        this.query()
-                    });
+                    return this.props.createEntity(entityName, entity, this.state.url)
+                        .then(() => {
+                            this.props.unfreeze();
+                            this.query();
+                        });
                 };
 
                 // Entity must contain id and the whole properties of the model
                 update = entity => {
                     this.checkSetup();
                     this.props.freeze();
-                    return this.props.updateEntity(entityName, entity, this.state.url, resultField, () => {
-                        this.props.unfreeze();
-                        this.query()
-                    });
+                    return this.props.updateEntity(entityName, entity, this.state.url, resultField)
+                        .then(() => {
+                            this.props.unfreeze();
+                            this.query();
+                        });
                 };
 
                 // The fields to be patched, field should contain id
                 patch = fields => {
                     this.checkSetup();
                     this.props.freeze();
-                    return this.props.patchEntity(entityName, fields, this.state.url, resultField, () => {
-                        this.props.unfreeze();
-                        this.query()
-                    });
+                    return this.props.patchEntity(entityName, fields, this.state.url, resultField)
+                        .then(() => {
+                            this.props.unfreeze();
+                            this.query()
+                        });
                 };
 
                 // Accepts the entity object that contains id or the id itself as a string
@@ -92,10 +95,11 @@ export default (entityName, {resultField = RESULT_FIELD, hideLoadIfDataFound = t
                     this.checkSetup();
                     if (typeof entity === 'string') entity = {id: entity};
                     this.props.freeze();
-                    return this.props.deleteEntity(entityName, entity, this.state.url, resultField, () => {
-                        this.props.unfreeze();
-                        this.query()
-                    });
+                    return this.props.deleteEntity(entityName, entity, this.state.url, resultField)
+                        .then(() => {
+                            this.props.unfreeze();
+                            this.query();
+                        });
                 };
 
                 // Garbage collector so the redux storage will not blow up!
