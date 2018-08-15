@@ -40,7 +40,7 @@ const dummyHOC = WrappedComponent => class extends React.Component{
 };
 const Component = () => <div>hi</div>;
 
-describe('Sanity', () => {
+describe.skip('Sanity', () => {
     it('checks 1 and 1 are equal', () => {
         expect(1).to.equal(1);
     });
@@ -51,7 +51,6 @@ describe('Sanity', () => {
     });
 
     it('can render a wrapped component and access the wrapped component', () => {
-
         const WrappedComponent = dummyHOC(Component);
         const wrapped = shallow(<WrappedComponent/>).first().shallow();
         expect(wrapped.find('div')).to.have.length(1);
@@ -65,11 +64,11 @@ describe('Sanity', () => {
 
     it('can shallow a full App simulation', () => {
         const wrapped = shallow(<App/>);
-        expect(wrapped.find('div')).to.have.length(0);
+        expect(wrapped.find('div')).to.have.length(1);
     });
 });
 
-describe('The example ContactDetail in App with detailedEntity decoration', () => {
+describe.skip('The example ContactDetail in App with detailedEntity decoration', () => {
     let contactDetail;
     let getProps;
 
@@ -137,6 +136,37 @@ describe('The example ContactDetail in App with detailedEntity decoration', () =
             expect(store.getState().contact).to.have.property('3');
             expect(store.getState().contact.tracker).to.have.lengthOf(2);
             expect(getProps().contact).to.have.property('id').that.is.equal('3');
+            done();
+        })
+    });
+
+});
+
+describe('The example ContactDetail in App with detailedEntity decoration', () => {
+    let contacts;
+    let getProps;
+
+    before(() => {
+        // Create a sample wrapped component
+        contacts = mount(<App/>).find('Contacts');
+        getProps = () => contacts.instance().props;
+    });
+
+    it.skip('should have a div and rest-react-redux methods injected as properties', () => {
+        expect(contacts.find('div')).to.have.length(1);
+        expect(contacts.props()).to.have.property('initialQueryContacts');
+        expect(contacts.props()).to.have.property('updateContact');
+    });
+
+    it.skip('is exposed to a store with an empty contacts field', () => {
+        expect(store.getState()).to.have.property('contacts').that.is.an('object')
+            .and.is.deep.equal({tracker: []});
+    });
+
+    it('can call initialQueryContacts method from the test scope, update store and receive data', done => {
+        getProps().initialQueryContacts('/contacts', {page: 1, pageSize: 10}).then(() => {
+            expect(store.getState().contact).to.have.property('1').and.not.to.have.property('2');
+            expect(getProps().contact).to.have.property('id').that.is.equal('1');
             done();
         })
     });

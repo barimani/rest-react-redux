@@ -1,8 +1,9 @@
 import { combineReducers } from 'redux';
-import { detailedEntityReducer } from '../src/index';
+import { detailedEntityReducer, queriedEntityReducer } from '../src/index';
 
 const reducers = {
     contact: detailedEntityReducer('contact'),
+    contacts: queriedEntityReducer('contact'),
 };
 
 export default combineReducers(reducers);
