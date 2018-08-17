@@ -35,11 +35,12 @@ export default (entityName, {reducerName, retain_number = RETAIN_NUMBER} = {}) =
 
             initialGet = (url, entityId) => {
                 this.setState({loadingData: true, url, entityId});
-                return this.get(url);
+                return this.get(url, entityId);
             };
 
-            get = (url = this.state.url) => {
-                this.props.freeze();
+            get = (url = this.state.url, entityId = this.state.entityId) => {
+                const entity = this.props[entityName][entityId];
+                if (!entity) this.props.freeze();
                 this.setState({loadingData: true});
                 return this.props.getItem(entityName, url)
                     .then(() => {this.setState({loadingData: false});this.props.unfreeze();this.collectGarbage();})
