@@ -1,4 +1,4 @@
-import {detailedUrl, encodeAPICall} from "../helpers";
+import {detailedUrl, encodeAPICall, LOADING} from "../helpers";
 import axios from "axios";
 import * as types from "../helpers";
 
@@ -34,11 +34,15 @@ const deleteEntityDispatch = (payload, entityName) => {
     };
 };
 
-export const queryEntities = (entityName, url, params) => {
-    return dispatch => axios.get(url, {params})
-        .then(({data}) => {
-            dispatch(insertQuery({...data, query: encodeAPICall(url, params)}, entityName));
+export const queryEntities = (entityName, url, params, hasData = false, setPreloadFlag = false) => {
+    return dispatch => {
+        const query = encodeAPICall(url, params);
+        hasData && dispatch(insertQuery({LOADING, query}, entityName));
+        return axios.get(url, {params}).then(({data}) => {
+            const payload = setPreloadFlag ? {...data, query, preloadedAt: new Date()} : {...data, query};
+            dispatch(insertQuery(payload, entityName));
         });
+    }
 };
 
 export const pushToQueue = (entityName, key, retain_number) => {

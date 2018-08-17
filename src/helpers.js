@@ -29,6 +29,12 @@ export const encodeAPICall = (url, params) => {
 };
 
 /**
+ * A placeholder constant for signalling the loading status in redux to prevent re-call
+ */
+export const LOADING = 'LOADING';
+
+
+/**
  * Generates a numerical hash from a string
  * @returns {number}
  */
