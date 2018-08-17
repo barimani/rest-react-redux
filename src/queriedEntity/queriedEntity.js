@@ -145,13 +145,15 @@ export default (entityName, {resultField = RESULT_FIELD, hideLoadIfDataFound = t
                     const queryMetadata = resultField ? {...queryData} : undefined;
                     if (resultField) delete queryMetadata[resultField];
 
-                    const paramsList = this.preLoaderFunc({...this.state.params, ...params}, {...queryMetadata});
+
+                    const paramsList = this.preLoaderFunc(params, {...this.state.params, ...params}, {...queryMetadata});
 
                     paramsList.forEach(params => {
-                        const data = this.props[PL(entityName)][encodeAPICall(url, params)];
+                        const fullParams = {...this.state.params, ...params};
+                        const data = this.props[PL(entityName)][encodeAPICall(url, fullParams)];
                         if (data) return;
-                        this.props.queryEntities(entityName, url, params, !data, true, smartPreload)
-                            .then(() => {this.collectGarbage(url, params);})
+                        this.props.queryEntities(entityName, url, fullParams, !data, true, smartPreload)
+                            .then(() => {this.collectGarbage(url, fullParams);})
                             .catch(() => {});
                     })
                 };
@@ -174,7 +176,7 @@ export default (entityName, {resultField = RESULT_FIELD, hideLoadIfDataFound = t
                         ['update' + CFL(entityName)]: this.update,
                         ['patch' + CFL(entityName)]: this.patch,
                         ['delete' + CFL(entityName)]: this.delete,
-                        ['set' + CFL(PL(entityName)) + 'PreLoader']: this.setPreLoader,
+                        ['set' + CFL(PL(entityName)) + 'Preloader']: this.setPreLoader,
                         ['loading' + CFL(PL(entityName))]: this.state.loadingData,
                     };
                     return (
