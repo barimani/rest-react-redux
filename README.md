@@ -84,7 +84,7 @@ NOTE: For those of you who do not enjoy decorating as much as I do, use the stan
 | delete[EntityName] | Removes an entity. After success, will update the store and queries again  | `deleteContact({id: 1, name: 'Foo Bar'})` |
 | loading[EntityName]s | Network loading status  | `loadingContacts` | `true` |
 
-### queriedEntity
+### detailedEntity
 
 if you intend to work with an endpoint that returns a detailed entity use `detailedEntity` to decorate your components:
 ```js
@@ -116,6 +116,7 @@ class ContactsPage extends React.Component {
 
 ### Todos
 
+ - Preloaders
  - Remove the redux-thunk dependency
  - Remove the JSON request/response requirement
  - Remove the need to update the reducer for each entity
