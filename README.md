@@ -23,7 +23,7 @@ What you need to do:
 This library is supposed to be used only on a restful endpoint. here is an example:
 - *GET*:  `http://www.url.com/contacts?page=1&page-size=10` returns a list of contacts and metadata about the query
 - *POST*:  `http://www.url.com/contacts` creates a contact
-- *GET*, *PUT*, *PATCH*: `http://www.url.com/contacts/contactId` gets, updates or patches the specific contact respectively
+- *GET*, *PUT*, *PATCH* and *DELETE*: `http://www.url.com/contacts/contactId` gets, updates or patches the specific contact respectively
 
 ## Restrictions in the current version
 - Json endpoints: network request and response body must be in JSON
@@ -84,7 +84,7 @@ NOTE: For those of you who do not enjoy decorating as much as I do, use the stan
 | delete[EntityName] | Removes an entity. After success, will update the store and queries again  | `deleteContact({id: 1, name: 'Foo Bar'})` |
 | loading[EntityName]s | Network loading status  | `loadingContacts` | `true` |
 
-### queriedEntity
+### detailedEntity
 
 if you intend to work with an endpoint that returns a detailed entity use `detailedEntity` to decorate your components:
 ```js
@@ -116,6 +116,7 @@ class ContactsPage extends React.Component {
 
 ### Todos
 
+ - Preloaders
  - Remove the redux-thunk dependency
  - Remove the JSON request/response requirement
  - Remove the need to update the reducer for each entity
