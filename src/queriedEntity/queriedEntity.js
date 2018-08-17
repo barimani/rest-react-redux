@@ -41,7 +41,7 @@ export default (entityName, {resultField = RESULT_FIELD, hideLoadIfDataFound = t
 
                 // Queries with the params, will construct query params based on the old ones and new ones
                 query = (params = this.state.params, url = this.state.url) => {
-                    const oldParams = {...this.state.params};
+                    const oldParams = {...params};
                     const newParams = {...oldParams, ...params};
                     this.setState({params: newParams, loadingData: true});
                     const dataExists = !!this.props[PL(entityName)][encodeAPICall(url, newParams)];
