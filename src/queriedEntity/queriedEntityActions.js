@@ -27,18 +27,35 @@ export const patchEntityDispatch = (payload, entityName) => {
 };
 
 const deleteEntityDispatch = (payload, entityName) => {
-    let type = types.DELETE_ENTITY(entityName);
     return {
-        type: type,
+        type: types.DELETE_ENTITY(entityName),
         payload
     };
 };
 
-export const queryEntities = (entityName, url, params, hasData = false, setPreloadFlag = false) => {
+const updateNetworkTimer = (payload, entityName) => {
+    return {
+        type: types.UPDATE_NETWORK_TIMER(entityName),
+        payload
+    };
+};
+
+export const queryEntities = (entityName, url, params, hasData = false, setPreloadFlag = false, smartPreload = false) => {
     return dispatch => {
         const query = encodeAPICall(url, params);
+
         hasData && dispatch(insertQuery({LOADING, query}, entityName));
+
+        let time;
+        if (smartPreload) time = new Date();
+
         return axios.get(url, {params}).then(({data}) => {
+
+            if (smartPreload) {
+                const timeDiff = (new Date() - time);
+                dispatch(updateNetworkTimer(timeDiff, entityName))
+            }
+
             const payload = setPreloadFlag ? {...data, query, preloadedAt: new Date()} : {...data, query};
             dispatch(insertQuery(payload, entityName));
         });
