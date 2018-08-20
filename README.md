@@ -23,7 +23,7 @@ What you need to do:
 This library is supposed to be used only on a restful endpoint. here is an example:
 - *GET*:  `http://www.url.com/contacts?page=1&page-size=10` returns a list of contacts and metadata about the query
 - *POST*:  `http://www.url.com/contacts` creates a contact
-- *GET*, *PUT*, *PATCH* and *DELETE*: `http://www.url.com/contacts/contactId` gets, updates or patches the specific contact respectively
+- *GET*, *PUT*, *PATCH* and *DELETE*: `http://www.url.com/contacts/contactId` gets, updates, patches or deletes the specific contact respectively
 
 ## Restrictions in the current version
 - JSON endpoints: network request and response body must be of `application/json` content type
@@ -137,7 +137,7 @@ import { queriedEntity } from 'rest-react-redux';
 @queriedEntity('contact')
 class ContactsPage extends React.Component {
     
-    componentDidMound() {
+    componentDidMount() {
         this.props.initialQueryContacts('/contacts/', {page: 1, size: 20});
         this.props.setContactsPreloader((partialParams) => {
             
@@ -170,7 +170,7 @@ import store from '../store';
 
 class Dashboard extends React.Component {
     
-    componentDidMound() {
+    componentDidMount() {
         // Preload a contact list query
         store.dispatch(queryEntities('contact', '/contacts/', {page: 1}));
         
