@@ -88,7 +88,8 @@ NOTE: For those of you who do not enjoy decorating as much as I do, use the stan
 | set[EntityName]sPreloader | Sets a function for pre-loading data for a smooth UX  | `setContactsPreloader(customPreloader)`* |
 | loading[EntityName]s | Network loading status  | `loadingContacts` | `true` |
 
-*Note: the library injects (partialParams, params, queryMetadata) as arguments. The function should return an array of partialParams;
+*Note: the preloader function will receive (partialParams, params, queryMetadata) as arguments. The function should return an array of partialParams. See the preloading
+section for more information
 
 ### detailedEntity
 
@@ -120,14 +121,14 @@ class ContactsPage extends React.Component {
 | delete[EntityName] | Removes the entity. After success, will update the store | `deleteContact({id: 1, name: 'Foo Bar'})` |
 | loading[EntityName] | Network loading status  | `loadingContact` | `true` |
 
-#### Preloading
+### Preloading
 For a better user experience, you may pre-load the data that have a good change of being loaded later. There are
 two main methods of preloading data:
 
-##### Entity specific preloading
+#### Entity specific preloading
 If you are dealing with a queried entity like calendar events, table data, chat messages etc.
 it might be a good idea to dynamically preload data based on what the user queries. For instance, loading the previous and
-the next pages of a table sounds like a good investment! to do that you simply need to set 
+the next pages of a table sounds like a good investment! To do that you simply need to set 
 a function via property `set[EntityName]sPreloader`: 
 
 ```js
@@ -152,7 +153,7 @@ class ContactsPage extends React.Component {
 }
 ```
 
-##### Generic preloading
+#### Generic preloading
 You may need to preload entities that are not related to the component you are focusing at.
 For instance, if a user gets to the main dashboard, you want to preload all the contacts before
 the user goes to the contacts page. To achieve that you can use the exposed `queryEntities` or `getEntity`
