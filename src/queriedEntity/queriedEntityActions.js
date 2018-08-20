@@ -44,7 +44,7 @@ export const queryEntities = (entityName, url, params, hasData = false, setPrelo
     return dispatch => {
         const query = encodeAPICall(url, params);
 
-        !hasData && dispatch(insertQuery({LOADING, query}, entityName));
+        hasData && dispatch(insertQuery({LOADING, query}, entityName));
 
         let time;
         if (smartPreload) time = new Date();
