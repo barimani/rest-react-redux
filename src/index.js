@@ -1,11 +1,12 @@
-import qer from './queriedEntity/queriedEntityReducer';
-import qe from './queriedEntity/queriedEntity';
-import der from './detailEntity/detailedEntityReducer';
-import de from './detailEntity/detailedEntity';
+import queriedEntityReducer from './queriedEntity/queriedEntityReducer';
+import queriedEntity from './queriedEntity/queriedEntity';
+import detailedEntityReducer from './detailEntity/detailedEntityReducer';
+import detailedEntity from './detailEntity/detailedEntity';
+import {queryEntities} from "./queriedEntity/queriedEntityActions";
+import {getItem as getDetailedEntity} from "./detailEntity/detailedEntityActions";
 
-export const queriedEntityReducer = qer;
-export const queriedEntity = qe;
-export const detailedEntityReducer = der;
-export const detailedEntity = de;
+
+export default {queriedEntityReducer, queriedEntity, detailedEntityReducer,
+    detailedEntity, queryEntities, getDetailedEntity }
 
 
