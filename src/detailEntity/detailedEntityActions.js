@@ -34,7 +34,7 @@ const insertItem = (payload, entityName) => {
     };
 };
 
-export const getItem = (entityName, url) => {
+export const getEntity = (entityName, url) => {
     return dispatch => axios.get(url).then(({data}) => {
         dispatch(insertItem(data, entityName));
     });

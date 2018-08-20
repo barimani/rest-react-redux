@@ -28,6 +28,6 @@ Object.defineProperty(exports , 'queryEntities', {
 });
 
 // Action
-Object.defineProperty(exports , 'getDetailedEntity', {
-    value: lib.getDetailedEntity
+Object.defineProperty(exports , 'getEntity', {
+    value: lib.getEntity
 });
