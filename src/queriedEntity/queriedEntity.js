@@ -36,12 +36,12 @@ export default (entityName, {resultField = RESULT_FIELD, hideLoadIfDataFound = t
                 // Sets up the query and makes the initial query
                 initialQuery = (url, params = {}) => {
                     this.setState({url});
-                    return this.query(params, url);
+                    return this.query(params, url, true);
                 };
 
                 // Queries with the params, will construct query params based on the old ones and new ones
-                query = (params = this.state.params, url = this.state.url) => {
-                    const oldParams = {...this.state.params};
+                query = (params = this.state.params, url = this.state.url, initial = false) => {
+                    const oldParams = initial ? {...params} : {...this.state.params};
                     const newParams = {...oldParams, ...params};
                     this.setState({params: newParams, loadingData: true});
                     const dataExists = !!this.props[PL(entityName)][encodeAPICall(url, newParams)];
