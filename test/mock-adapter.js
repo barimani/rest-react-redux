@@ -9,15 +9,11 @@ axios.defaults.baseURL = 'http://mockserver.com';
  * Sets up the mock server with corresponding endpoints
  */
 const configureAxiosMockAdapter = () => {
-    // Creating a mock instance with a delay response
+
     const mock = new MockAdapter(axios);
 
+    let contacts = [{id: '1', name: 'Name1'}, {id: '2', name: 'Name2'}, {id: '3', name: 'Name3'}];
 
-    let contacts = [{id: '1', name: 'Bari'}, {id: '2', name: 'Mani'}];
-
-    /**
-     * Mocking Authentication/Evaluation/Registration flow
-     * */
     mock.onGet(/\/contacts\/\d+/).reply(({url}) => {
         const id = url.match(/\d+/)[0];
         const contact = contacts.find(contact => contact.id == id);
@@ -51,6 +47,10 @@ const configureAxiosMockAdapter = () => {
         if (removeSuccessful) return [200];
         else return [404];
     });
+
+    mock.onGet('contacts').reply(({params}) => {
+        console.log(config);
+    })
 };
 
 export default configureAxiosMockAdapter;

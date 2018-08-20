@@ -1,7 +1,7 @@
 import React from 'react';
 import { Provider } from 'react-redux';
 import store from './store';
-import {detailedEntity} from "../src";
+import {detailedEntity, queriedEntity} from "../src";
 import mockServer from './mock-adapter';
 mockServer();
 
@@ -12,12 +12,22 @@ class ContactDetail extends React.Component {
     }
 }
 
+@queriedEntity('contact')
+class Contacts extends React.Component {
+    render() {
+        return <div>test component</div>
+    }
+}
+
 class App extends React.Component {
 
     render() {
         return (
             <Provider store={store}>
-                <ContactDetail/>
+                <div>
+                    <ContactDetail/>
+                    <Contacts/>
+                </div>
             </Provider>
         )
     }

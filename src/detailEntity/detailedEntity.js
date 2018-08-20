@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import {getItem, createItem, deleteItem, patchItem, pushToQueue, updateItem} from "./detailedEntityActions";
+import {getEntity, createItem, deleteItem, patchItem, pushToQueue, updateItem} from "./detailedEntityActions";
 import {CFL} from "../helpers";
 
 /**
@@ -17,7 +17,7 @@ import {CFL} from "../helpers";
 
 // These props should be filtered before inject
 const filteredProps = {};
-['getItem', 'pushToQueue', 'createItem', 'updateItem', 'patchItem', 'deleteItem']
+['getEntity', 'pushToQueue', 'createItem', 'updateItem', 'patchItem', 'deleteItem']
     .forEach(prop => filteredProps[prop] = undefined);
 
 // Number of queries to cache in store
@@ -26,7 +26,7 @@ const RETAIN_NUMBER = 10;
 
 export default (entityName, {reducerName, retain_number = RETAIN_NUMBER} = {}) => WrappedComponent =>
     connect(state => ({[entityName]: state[reducerName || entityName]}),
-        {getItem, pushToQueue, createItem, updateItem, patchItem, deleteItem})(
+        {getEntity, pushToQueue, createItem, updateItem, patchItem, deleteItem})(
         class extends React.Component {
 
             static defaultProps = {freeze: () => {}, unfreeze: () => {}};
@@ -42,7 +42,7 @@ export default (entityName, {reducerName, retain_number = RETAIN_NUMBER} = {}) =
                 const entity = this.props[entityName][entityId];
                 if (!entity) this.props.freeze();
                 this.setState({loadingData: true});
-                return this.props.getItem(entityName, url)
+                return this.props.getEntity(entityName, url)
                     .then(() => {this.setState({loadingData: false});this.props.unfreeze();this.collectGarbage();})
                     .catch(() => {this.setState({loadingData: false});this.props.unfreeze();});
             };

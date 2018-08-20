@@ -51,7 +51,6 @@ describe('Sanity', () => {
     });
 
     it('can render a wrapped component and access the wrapped component', () => {
-
         const WrappedComponent = dummyHOC(Component);
         const wrapped = shallow(<WrappedComponent/>).first().shallow();
         expect(wrapped.find('div')).to.have.length(1);
@@ -65,11 +64,11 @@ describe('Sanity', () => {
 
     it('can shallow a full App simulation', () => {
         const wrapped = shallow(<App/>);
-        expect(wrapped.find('div')).to.have.length(0);
+        expect(wrapped.find('div')).to.have.length(1);
     });
 });
 
-describe('Fully mounted App', () => {
+describe('The example ContactDetail in App with detailedEntity decoration', () => {
     let contactDetail;
     let getProps;
 
@@ -79,17 +78,18 @@ describe('Fully mounted App', () => {
         getProps = () => contactDetail.instance().props;
     });
 
-    it('can fully mount the App component', () => {
+    it('should have a div and rest-react-redux methods injected as properties', () => {
         expect(contactDetail.find('div')).to.have.length(1);
         expect(contactDetail.props()).to.have.property('initialGetContact');
+        expect(contactDetail.props()).to.have.property('updateContact');
     });
 
-    it('has a store with an empty contact field', () => {
+    it('is exposed to a store with an empty contact field', () => {
         expect(store.getState()).to.have.property('contact').that.is.an('object')
             .and.is.deep.equal({tracker: []});
     });
 
-    it('can call a intialGet[EntityName] method from the test scope and receive data', done => {
+    it('can call initialGetContact method from the test scope, update store and receive data', done => {
         getProps().initialGetContact('/contacts/1', '1').then(() => {
             expect(store.getState().contact).to.have.property('1').and.not.to.have.property('2');
             expect(getProps().contact).to.have.property('id').that.is.equal('1');
@@ -105,15 +105,17 @@ describe('Fully mounted App', () => {
         })
     });
 
-    it('can fetch via getContact and see that the data is actually updated', done => {
+    it('can fetch via getContact and see that the data has not changed', done => {
         getProps().getContact().then(() => {
             expect(getProps().contact).to.have.property('name').that.is.equal('changed name');
             done();
         })
     });
 
-    it('can remove the contact entity', done => {
+    it('can remove the contact entity and reflect in the store', done => {
         getProps().deleteContact().then(() => {
+            expect(store.getState().contact).to.not.have.property('1');
+            expect(store.getState().contact.tracker).to.have.lengthOf(0);
             expect(getProps().contact).to.be.deep.equal({});
             done();
         })
@@ -121,8 +123,50 @@ describe('Fully mounted App', () => {
 
     it('can get the second contact entity', done => {
         getProps().initialGetContact('/contacts/2', '2').then(() => {
-            expect(store.getState().contact).to.have.property('2').and.not.to.have.property('1');
+            expect(store.getState().contact).to.have.property('2');
+            expect(store.getState().contact).to.not.have.property('1');
             expect(getProps().contact).to.have.property('id').that.is.equal('2');
+            done();
+        })
+    });
+
+    it('can get the third contact and store should remember the second contact as well', done => {
+        getProps().initialGetContact('/contacts/3', '3').then(() => {
+            expect(store.getState().contact).to.have.property('2');
+            expect(store.getState().contact).to.have.property('3');
+            expect(store.getState().contact.tracker).to.have.lengthOf(2);
+            expect(getProps().contact).to.have.property('id').that.is.equal('3');
+            done();
+        })
+    });
+
+});
+
+describe('The example ContactDetail in App with detailedEntity decoration', () => {
+    let contacts;
+    let getProps;
+
+    before(() => {
+        // Create a sample wrapped component
+        contacts = mount(<App/>).find('Contacts');
+        getProps = () => contacts.instance().props;
+    });
+
+    it('should have a div and rest-react-redux methods injected as properties', () => {
+        expect(contacts.find('div')).to.have.length(1);
+        expect(contacts.props()).to.have.property('initialQueryContacts');
+        expect(contacts.props()).to.have.property('updateContact');
+    });
+
+    it('is exposed to a store with an empty contacts field', () => {
+        expect(store.getState()).to.have.property('contacts').that.is.an('object')
+            .and.is.deep.equal({tracker: []});
+    });
+
+    it.skip('can call initialQueryContacts method from the test scope, update store and receive data', done => {
+        getProps().initialQueryContacts('/contacts', {page: 1, pageSize: 10}).then(() => {
+            expect(store.getState().contact).to.have.property('1').and.not.to.have.property('2');
+            expect(getProps().contact).to.have.property('id').that.is.equal('1');
             done();
         })
     });

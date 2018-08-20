@@ -1,6 +1,6 @@
 import * as types from '../helpers';
 
-const defaultState = {tracker: []};
+const defaultState = {tracker: [], networkTimer: {average: 0, numberOfCalls: 0}};
 
 /**
  * Reducer generator for storing and to caching queried entities
@@ -10,7 +10,14 @@ export default entityName => (state = defaultState, action) => {
         case (types.INSERT_QUERY(entityName)): {
             return {...state, [action.payload.query]: action.payload};
         }
-
+        case (types.UPDATE_NETWORK_TIMER(entityName)): {
+            const {average, numberOfCalls} = state.networkTimer;
+            // Cumulative averaging
+            const newAverage = (average * numberOfCalls + action.payload) / (numberOfCalls + 1);
+            const newNumberOfCalls = numberOfCalls + 1;
+            const networkTimer = {average: newAverage, numberOfCalls: newNumberOfCalls};
+            return {...state, networkTimer};
+        }
         case (types.PUSH_TO_TRACKING_QUEUE(entityName)): {
             let tracker = [...state.tracker];
             const {key, retain_number} = action.payload;

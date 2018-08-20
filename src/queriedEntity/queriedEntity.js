@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import {encodeAPICall, PL} from "../helpers";
+import {encodeAPICall, LOADING, PL} from "../helpers";
 import {CFL} from "../helpers";
 import {queryEntities, pushToQueue, createEntity, updateEntity, patchEntity, deleteEntity} from './queriedEntityActions';
 
@@ -11,8 +11,15 @@ import {queryEntities, pushToQueue, createEntity, updateEntity, patchEntity, del
  * Per entityName used, there must be a reducer with the same name located at reducers/index.js
  */
 
+
 // Default number of queries to cache in store
 const RETAIN_NUMBER = 10;
+
+// Default time for a valid preload (milliseconds)
+const PRELOAD_VALID_TIME = 10000;
+
+// Default time that is compared with average network time to decide whether to perform preload (milliseconds)
+const SMART_THRESHOLD_TIME = 300;
 
 // Default field that maps the results in the response body, if set to null, the whole response will be returned;
 const RESULT_FIELD = 'content';
@@ -23,7 +30,8 @@ const filteredProps = {};
     'updateEntity', 'patchEntity', 'deleteEntity'].forEach(prop => filteredProps[prop] = undefined);
 
 export default (entityName, {resultField = RESULT_FIELD, hideLoadIfDataFound = true,
-    retain_number = RETAIN_NUMBER, reducer_name} = {}) =>
+    retain_number = RETAIN_NUMBER, reducer_name, preloadValidTime = PRELOAD_VALID_TIME,
+    smartPreload = false, smartThresholdTime = SMART_THRESHOLD_TIME} = {}) =>
     WrappedComponent =>
         connect(state => ({[PL(entityName)]: state[reducer_name || PL(entityName)]}),
             {queryEntities, pushToQueue, createEntity, updateEntity, patchEntity, deleteEntity})(
@@ -32,6 +40,10 @@ export default (entityName, {resultField = RESULT_FIELD, hideLoadIfDataFound = t
                 static defaultProps = {freeze: () => {}, unfreeze: () => {}};
 
                 state = {params: {}, loadingData: false};
+
+                // An optional function where pre loads data, argument are params, metadata and returns a new params
+                // or a list of params to preload
+                preLoaderFunc = undefined;
 
                 // Sets up the query and makes the initial query
                 initialQuery = (url, params = {}) => {
@@ -44,9 +56,15 @@ export default (entityName, {resultField = RESULT_FIELD, hideLoadIfDataFound = t
                     const oldParams = initial ? {...params} : {...this.state.params};
                     const newParams = {...oldParams, ...params};
                     this.setState({params: newParams, loadingData: true});
-                    const dataExists = !!this.props[PL(entityName)][encodeAPICall(url, newParams)];
-                    if (!dataExists || !hideLoadIfDataFound) this.props.freeze();
-                    return this.props.queryEntities(entityName, url, newParams)
+                    const data = this.props[PL(entityName)][encodeAPICall(url, newParams)];
+                    if (!data || !hideLoadIfDataFound) this.props.freeze();
+
+                    this.preload(params, url);
+
+                    // If it should not load the data
+                    if (!this.shouldLoad(data)) return Promise.resolve();
+
+                    return this.props.queryEntities(entityName, url, newParams, !data, false, smartPreload)
                         .then(() => {this.setState({loadingData: false});this.props.unfreeze();this.collectGarbage(url, newParams);})
                         .catch(() => {this.setState({loadingData: false, params: oldParams});this.props.unfreeze();});
                 };
@@ -55,6 +73,15 @@ export default (entityName, {resultField = RESULT_FIELD, hideLoadIfDataFound = t
                 checkSetup = () => {
                     const { url } = this.state;
                     if (!url) throw new Error(`No url specified for ${entityName}`);
+                };
+
+                // Determines whether a network call should be made to refresh
+                shouldLoad = data => {
+                    if (!data) return true;
+                    if (data === LOADING) return false;
+                    // Check whether pre-loaded less than 10 seconds ago
+                    if (data.preloadedAt && ((new Date()) - data.preloadedAt) < preloadValidTime) return false;
+                    return true;
                 };
 
                 // this entity does not contain id
@@ -102,6 +129,35 @@ export default (entityName, {resultField = RESULT_FIELD, hideLoadIfDataFound = t
                         });
                 };
 
+                setPreLoader = preLoaderFunc => {this.preLoaderFunc = preLoaderFunc};
+
+                preload = (params, url) => {
+                    if (!this.preLoaderFunc) return;
+
+                    // If in smartPreload mode and average of network calls are above 0.3 seconds do not preload
+                    if (smartPreload) {
+                        const {average, numberOfCalls} = this.props[PL(entityName)].networkTimer;
+                        if (numberOfCalls > 3 && average > smartThresholdTime) return;
+                    }
+
+                    // The next 3 lines are repetitive and should be optimized
+                    const queryData = this.props[PL(entityName)][encodeAPICall(url, params)] || {};
+                    const queryMetadata = resultField ? {...queryData} : undefined;
+                    if (resultField) delete queryMetadata[resultField];
+
+
+                    const paramsList = this.preLoaderFunc(params, {...this.state.params, ...params}, {...queryMetadata});
+
+                    paramsList.forEach(params => {
+                        const fullParams = {...this.state.params, ...params};
+                        const data = this.props[PL(entityName)][encodeAPICall(url, fullParams)];
+                        if (data) return;
+                        this.props.queryEntities(entityName, url, fullParams, !data, true, smartPreload)
+                            .then(() => {this.collectGarbage(url, fullParams);})
+                            .catch(() => {});
+                    })
+                };
+
                 // Garbage collector so the redux storage will not blow up!
                 collectGarbage = (url, params) => this.props.pushToQueue(entityName, encodeAPICall(url, params), retain_number);
 
@@ -120,6 +176,7 @@ export default (entityName, {resultField = RESULT_FIELD, hideLoadIfDataFound = t
                         ['update' + CFL(entityName)]: this.update,
                         ['patch' + CFL(entityName)]: this.patch,
                         ['delete' + CFL(entityName)]: this.delete,
+                        ['set' + CFL(PL(entityName)) + 'Preloader']: this.setPreLoader,
                         ['loading' + CFL(PL(entityName))]: this.state.loadingData,
                     };
                     return (

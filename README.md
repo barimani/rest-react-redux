@@ -26,7 +26,7 @@ This library is supposed to be used only on a restful endpoint. here is an examp
 - *GET*, *PUT*, *PATCH* and *DELETE*: `http://www.url.com/contacts/contactId` gets, updates or patches the specific contact respectively
 
 ## Restrictions in the current version
-- Json endpoints: network request and response body must be in JSON
+- JSON endpoints: network request and response body must be of `application/json` content type
 - Redux-thunk: your application redux store must contain redux-thunk as middleware
 ```js
 import {createStore, compose, applyMiddleware} from 'redux';
@@ -65,10 +65,13 @@ NOTE: For those of you who do not enjoy decorating as much as I do, use the stan
 
 | Config field | Explanation | Default Value |
 | ------ | ------ | ------ |
-| resultField | he result field name in response body that matches the list of items | `content` |
+| resultField | the result field name in response body that matches the list of items | `content` |
 | retain_number | maximum number of queries to cache | `10` |
 | hideLoadIfDataFound | if set to `false`, will trigger loading UI even if data had been cached | `true` |
 | reducerName | The reducer name used for the entity. Default is the plural form of the entityName | `[entityName]s` |
+| preloadValidTime | The time (milliseconds) that a preloaded query is valid and should not be re-fetched | `10000` |
+| smartPreload | If set to `true` the library times the network calls specific to the defined entity. If the average is greater than 0.3 seconds, preloading will be cancelled. Overwrite this time with the next field | `false` |
+| smartThresholdTime | The acceptable average time (milliseconds) for network calls to continue preloading in `smartPreload` mode | `300` |
 
 #### Properties injected to the wrapped component
 | property (props) | Explanation | Example | Sample value |
@@ -77,12 +80,16 @@ NOTE: For those of you who do not enjoy decorating as much as I do, use the stan
 | [entityName]sQueryParams | The last successful parameters with which query was performed | `contactsQueryParams` | `{page: 1}` |
 | [entityName]sMetadata | The metadata that is received from the endpoint | `contactsMetadata` | `{totalPages: 10}` |
 | initialQuery[EntityName]s | A *must-be-called* function that initializes the query. Receives url and parameters (object) | `initialQueryContacts('/contacts/', {page: 1})` |
-| query[EntityName]s | Any query after initial query call. It will append the new params on top of the previous ones  | `queryContacts({pageSize: 1})` |
+| query[EntityName]s | Any query after initial query call. It will append the new partial params on top of the previous ones  | `queryContacts({pageSize: 1})` |
 | create[EntityName] | Creates an object and performs the latest query again  | `createContact({name: 'Foo Bar'})` |
 | update[EntityName] | Updates/replaces an entity. After success, will update the store and queries again  | `updateContact({id: 1, name: 'Foo Bar'})` |
 | patch[EntityName] | Patches an entity. After success, will update the store and queries again  | `patchContact({id: 1, name: 'Foo Bar'})` |
 | delete[EntityName] | Removes an entity. After success, will update the store and queries again  | `deleteContact({id: 1, name: 'Foo Bar'})` |
+| set[EntityName]sPreloader | Sets a function for pre-loading data for a smooth UX  | `setContactsPreloader(customPreloader)`* |
 | loading[EntityName]s | Network loading status  | `loadingContacts` | `true` |
+
+*Note: the preloader function will receive (partialParams, params, queryMetadata) as arguments. The function should return an array of partialParams. See the preloading
+section for more information
 
 ### detailedEntity
 
@@ -114,9 +121,68 @@ class ContactsPage extends React.Component {
 | delete[EntityName] | Removes the entity. After success, will update the store | `deleteContact({id: 1, name: 'Foo Bar'})` |
 | loading[EntityName] | Network loading status  | `loadingContact` | `true` |
 
+### Preloading
+For a better user experience, you may pre-load the data that have a good chance of being loaded later. There are
+two main methods of preloading data:
+
+#### Entity specific preloading
+If you are dealing with a queried entity like calendar events, table data, chat messages etc.
+it might be a good idea to dynamically preload data based on what the user queries. For instance, loading the previous and
+the next pages of a table sounds like a good investment! To do that you simply need to set 
+a function via property `set[EntityName]sPreloader`: 
+
+```js
+import { queriedEntity } from 'rest-react-redux';
+
+@queriedEntity('contact')
+class ContactsPage extends React.Component {
+    
+    componentDidMound() {
+        this.props.initialQueryContacts('/contacts/', {page: 1, size: 20});
+        this.props.setContactsPreloader((partialParams) => {
+            
+            const page = partialParams.page;
+            
+            // If the query does not contain a new page do not preload
+            if (!partialParams.page) return [];
+            
+            // Preload previous and next pages
+            return [{page: page - 1}, {page: page + 1}];
+        })
+    }
+}
+```
+
+#### Generic preloading
+You may need to preload entities that are not related to the component you are focusing at.
+For instance, if a user gets to the main dashboard, you want to preload all the contacts before
+the user goes to the contacts page. To achieve that you can use the exposed `queryEntities` or `getEntity`
+action generators:
+
+`queryEntities(entityName, url, params)`  
+`getEntity(entityName, url)`
+
+Usage example:
+
+```js
+import { queryEntities, getEntity } from 'rest-react-redux';
+import store from '../store';
+
+class Dashboard extends React.Component {
+    
+    componentDidMound() {
+        // Preload a contact list query
+        store.dispatch(queryEntities('contact', '/contacts/', {page: 1}));
+        
+        // Preload a detailed contact
+        store.dispatch(getEntity('contact', '/contacts/1'));
+    }
+}
+```
+
+
 ### Todos
 
- - Preloaders
  - Remove the redux-thunk dependency
  - Remove the JSON request/response requirement
  - Remove the need to update the reducer for each entity

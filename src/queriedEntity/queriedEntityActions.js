@@ -1,4 +1,4 @@
-import {detailedUrl, encodeAPICall} from "../helpers";
+import {detailedUrl, encodeAPICall, LOADING} from "../helpers";
 import axios from "axios";
 import * as types from "../helpers";
 
@@ -27,18 +27,39 @@ export const patchEntityDispatch = (payload, entityName) => {
 };
 
 const deleteEntityDispatch = (payload, entityName) => {
-    let type = types.DELETE_ENTITY(entityName);
     return {
-        type: type,
+        type: types.DELETE_ENTITY(entityName),
         payload
     };
 };
 
-export const queryEntities = (entityName, url, params) => {
-    return dispatch => axios.get(url, {params})
-        .then(({data}) => {
-            dispatch(insertQuery({...data, query: encodeAPICall(url, params)}, entityName));
+const updateNetworkTimer = (payload, entityName) => {
+    return {
+        type: types.UPDATE_NETWORK_TIMER(entityName),
+        payload
+    };
+};
+
+export const queryEntities = (entityName, url, params, hasData = false, setPreloadFlag = false, smartPreload = false) => {
+    return dispatch => {
+        const query = encodeAPICall(url, params);
+
+        !hasData && dispatch(insertQuery({LOADING, query}, entityName));
+
+        let time;
+        if (smartPreload) time = new Date();
+
+        return axios.get(url, {params}).then(({data}) => {
+
+            if (smartPreload) {
+                const timeDiff = (new Date() - time);
+                dispatch(updateNetworkTimer(timeDiff, entityName))
+            }
+
+            const payload = setPreloadFlag ? {...data, query, preloadedAt: new Date()} : {...data, query};
+            dispatch(insertQuery(payload, entityName));
         });
+    }
 };
 
 export const pushToQueue = (entityName, key, retain_number) => {

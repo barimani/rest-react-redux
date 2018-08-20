@@ -1,6 +1,6 @@
 {
   "name": "rest-react-redux",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "A library that provides higher order components for communicating with a backend server via standard rest API protocol",
   "homepage": "https://github.com/barimani/Rest-React-Redux",
   "main": "index.js",
