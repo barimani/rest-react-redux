@@ -1,7 +1,7 @@
 import React from 'react';
 import { Provider } from 'react-redux';
 import store from './store';
-import {detailedEntity, queriedEntity} from "../src";
+import {detailedEntity, queriedEntity} from "../../src/index";
 import mockServer from './mock-adapter';
 mockServer();
 

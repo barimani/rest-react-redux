@@ -1,3 +1,5 @@
+import {encodeAPICall} from "../src/helpers";
+
 const { JSDOM } = require('jsdom');
 
 const jsdom = new JSDOM('<!doctype html><html><body></body></html>');
@@ -27,7 +29,7 @@ import React from 'react';
 import {expect} from 'chai';
 import Enzyme, { shallow, mount } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
-import App, {store} from './App';
+import App, {store} from './sampleTestApp/App';
 
 Enzyme.configure({ adapter: new Adapter() });
 
@@ -39,6 +41,12 @@ const dummyHOC = WrappedComponent => class extends React.Component{
     }
 };
 const Component = () => <div>hi</div>;
+
+/**
+ * The following tests are by no means considered as 'unit tests'. The tests describe a story from top to bottom.
+ * Skipping/modifying a story could cause any test after that to fail
+ */
+
 
 describe('Sanity', () => {
     it('checks 1 and 1 are equal', () => {
@@ -68,7 +76,7 @@ describe('Sanity', () => {
     });
 });
 
-describe('The example ContactDetail in App with detailedEntity decoration', () => {
+describe('The example Contacts in App with detailedEntity decoration', () => {
     let contactDetail;
     let getProps;
 
@@ -80,13 +88,12 @@ describe('The example ContactDetail in App with detailedEntity decoration', () =
 
     it('should have a div and rest-react-redux methods injected as properties', () => {
         expect(contactDetail.find('div')).to.have.length(1);
-        expect(contactDetail.props()).to.have.property('initialGetContact');
-        expect(contactDetail.props()).to.have.property('updateContact');
+        expect(getProps()).to.have.property('initialGetContact');
+        expect(getProps()).to.have.property('updateContact');
     });
 
     it('is exposed to a store with an empty contact field', () => {
-        expect(store.getState()).to.have.property('contact').that.is.an('object')
-            .and.is.deep.equal({tracker: []});
+        expect(store.getState()).to.have.property('contact').that.is.an('object');
     });
 
     it('can call initialGetContact method from the test scope, update store and receive data', done => {
@@ -154,23 +161,60 @@ describe('The example ContactDetail in App with detailedEntity decoration', () =
 
     it('should have a div and rest-react-redux methods injected as properties', () => {
         expect(contacts.find('div')).to.have.length(1);
-        expect(contacts.props()).to.have.property('initialQueryContacts');
-        expect(contacts.props()).to.have.property('updateContact');
+        expect(getProps()).to.have.property('initialQueryContacts');
+        expect(getProps()).to.have.property('updateContact');
     });
 
     it('is exposed to a store with an empty contacts field', () => {
-        expect(store.getState()).to.have.property('contacts').that.is.an('object')
-            .and.is.deep.equal({tracker: []});
+        expect(store.getState()).to.have.property('contacts').that.is.an('object');
     });
 
-    it.skip('can call initialQueryContacts method from the test scope, update store and receive data', done => {
+    it('can call initialQueryContacts method from the test scope, update store and receive data', done => {
         getProps().initialQueryContacts('/contacts', {page: 1, pageSize: 10}).then(() => {
-            expect(store.getState().contact).to.have.property('1').and.not.to.have.property('2');
-            expect(getProps().contact).to.have.property('id').that.is.equal('1');
+            const hashedKey = encodeAPICall('/contacts', {page: 1, pageSize: 10});
+            expect(store.getState().contacts).to.have.property(hashedKey);
+            expect(getProps().contacts).to.have.lengthOf(10);
+            expect(getProps().contactsQueryParams).to.be.deep.equal({page: 1, pageSize: 10});
+            expect(getProps().contactsMetadata).to.have.property('totalItems').that.is.not.equal(0);
+            expect(getProps().contactsMetadata).to.have.property('totalPages').that.is.not.equal(0);
             done();
         })
     });
 
+    it('can perform a second query without losing the previous data', done => {
+        getProps().queryContacts({page: 2}).then(() => {
+            // Params updated correctly
+            expect(getProps().contactsQueryParams).to.be.deep.equal({page: 2, pageSize: 10});
+            expect(getProps().contacts).to.have.lengthOf(10);
+            done();
+        })
+    });
+
+    it('query with a different pageSize', done => {
+        getProps().queryContacts({pageSize: 5}).then(() => {
+            // Params updated correctly
+            expect(getProps().contactsQueryParams).to.be.deep.equal({page: 2, pageSize: 5});
+            expect(getProps().contacts).to.have.lengthOf(5);
+            done();
+        })
+    });
+
+    it('can update a single entity', done => {
+        const targetContact =  getProps().contacts[0];
+        targetContact.name = 'Changed name';
+        getProps().updateContact(targetContact).then(() => {
+            expect(getProps().contacts[0].name).to.equal('Changed name');
+            done();
+        })
+    });
+
+    it('can delete a single entity', done => {
+        const targetContact =  getProps().contacts[0];
+        getProps().deleteContact(targetContact).then(() => {
+            expect(getProps().contacts[0].name).to.not.equal(targetContact.name);
+            done();
+        })
+    });
 });
 
 

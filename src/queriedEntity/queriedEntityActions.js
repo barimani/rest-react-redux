@@ -69,7 +69,7 @@ export const pushToQueue = (entityName, key, retain_number) => {
     };
 };
 
-export const createEntity = (entityName, entity, url, onSuccess, onFailure) => {
+export const createEntity = (entityName, entity, url) => {
     // The returned data will not be of any special use since the position it is placed in db is unknown
     // therefore no dispatch is made to store
     return () => axios.post(url, entity);

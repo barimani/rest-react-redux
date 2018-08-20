@@ -12,7 +12,7 @@ const configureAxiosMockAdapter = () => {
 
     const mock = new MockAdapter(axios);
 
-    let contacts = [{id: '1', name: 'Name1'}, {id: '2', name: 'Name2'}, {id: '3', name: 'Name3'}];
+    let contacts = Array.from(Array(50).keys()).map(n => ({id: n.toString(), name: 'Name' + n}));
 
     mock.onGet(/\/contacts\/\d+/).reply(({url}) => {
         const id = url.match(/\d+/)[0];
@@ -49,7 +49,19 @@ const configureAxiosMockAdapter = () => {
     });
 
     mock.onGet('contacts').reply(({params}) => {
-        console.log(config);
+        const {page = 1, pageSize = 10} = params;
+
+        // Check out of index
+        if (contacts.length < (page - 1) * pageSize) {
+            return [404]
+        } else {
+            const filteredContacts = contacts.slice((page - 1) * pageSize, Math.min(page * pageSize, contacts.length));
+            return [200, {
+                totalItems: contacts.length,
+                totalPages: Math.floor(contacts.length / pageSize),
+                content: filteredContacts
+            }];
+        }
     })
 };
 
