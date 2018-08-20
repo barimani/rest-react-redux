@@ -26,7 +26,7 @@ This library is supposed to be used only on a restful endpoint. here is an examp
 - *GET*, *PUT*, *PATCH* and *DELETE*: `http://www.url.com/contacts/contactId` gets, updates or patches the specific contact respectively
 
 ## Restrictions in the current version
-- Json endpoints: network request and response body must be in JSON
+- JSON endpoints: network request and response body must be of `application/json` content type
 - Redux-thunk: your application redux store must contain redux-thunk as middleware
 ```js
 import {createStore, compose, applyMiddleware} from 'redux';
@@ -122,7 +122,7 @@ class ContactsPage extends React.Component {
 | loading[EntityName] | Network loading status  | `loadingContact` | `true` |
 
 ### Preloading
-For a better user experience, you may pre-load the data that have a good change of being loaded later. There are
+For a better user experience, you may pre-load the data that have a good chance of being loaded later. There are
 two main methods of preloading data:
 
 #### Entity specific preloading
