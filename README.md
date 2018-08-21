@@ -118,7 +118,7 @@ class ContactsPage extends React.Component {
 | get[EntityName] | Any get call after the initial get call. This is usually used for receiving updates if any  | `getContact()` |
 | update[EntityName] | Updates/replaces the entity. After success, will update the store and gets again  | `updateContact({id: 1, name: 'Foo Bar'})` |
 | patch[EntityName] | Patches the entity. After success, will update the store and gets again  | `patchContact({id: 1, name: 'Foo Bar'})` |
-| delete[EntityName] | Removes the entity. After success, will update the store | `deleteContact({id: 1, name: 'Foo Bar'})` |
+| delete[EntityName] | Removes the entity. After success, will update the store | `deleteContact()` |
 | loading[EntityName] | Network loading status  | `loadingContact` | `true` |
 
 ### Preloading
