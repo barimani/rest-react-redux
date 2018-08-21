@@ -76,7 +76,7 @@ describe('Sanity', () => {
     });
 });
 
-describe('The example Contacts in App with detailedEntity decoration', () => {
+describe('The example ContactDetails in App with detailedEntity decoration', () => {
     let contactDetail;
     let getProps;
 
@@ -149,7 +149,7 @@ describe('The example Contacts in App with detailedEntity decoration', () => {
 
 });
 
-describe('The example ContactDetail in App with detailedEntity decoration', () => {
+describe('The example Contacts in App with queriedEntity decoration', () => {
     let contacts;
     let getProps;
 
