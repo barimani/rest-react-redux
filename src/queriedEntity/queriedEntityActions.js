@@ -34,9 +34,12 @@ const deleteEntityDispatch = (payload, entityName) => {
     };
 };
 
-export const queryEntities = (entityName, url, params) => {
+export const queryEntities = (entityName, url, params, resultField) => {
     return dispatch => axios.get(url, {params})
         .then(({data}) => {
+            // Checking the existence of data
+            if (!data[resultField]) console.warn(`No data found for ${entityName} at property ${resultField}.
+Please verify your API response schema`);
             dispatch(insertQuery({...data, query: encodeAPICall(url, params)}, entityName));
         });
 };

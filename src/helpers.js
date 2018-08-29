@@ -72,3 +72,19 @@ export const detailedUrl = (baseUrl, id) => {
     const hasTrailingSlash = baseUrl.endsWith('/');
     return baseUrl + (!hasTrailingSlash ? '/' : '') + id + (hasTrailingSlash ? '/' : '');
 };
+
+/**
+ * Error handlers, mostly communicates to the developer via console
+ */
+export const repoShouldExist = (reduxRepo, entityName, reducer_name) => {
+    if (!reduxRepo)
+        console.error(`No redux repository found for ${reducer_name || PL(entityName)}.
+Please use queriedEntityReducer with the name ${reducer_name || PL(entityName)}`);
+
+    if (!reduxRepo.tracker) console.error(`Incorrect reducer found for ${reducer_name || PL(entityName)}.
+Please use queriedEntityReducer to generate this redux repository`);
+};
+
+export const shouldExist = (element, elementName) => {
+    if (!element) console.error(`${elementName} should exist but found ${element}`)
+};

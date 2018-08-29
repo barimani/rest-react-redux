@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import {encodeAPICall, PL} from "../helpers";
+import {encodeAPICall, PL, repoShouldExist, shouldExist} from "../helpers";
 import {CFL} from "../helpers";
 import {queryEntities, pushToQueue, createEntity, updateEntity, patchEntity, deleteEntity} from './queriedEntityActions';
 
@@ -33,6 +33,13 @@ export default (entityName, {resultField = RESULT_FIELD, hideLoadIfDataFound = t
 
                 state = {params: {}, loadingData: false};
 
+
+                // This checks the redux repo status and its validity
+                componentDidMount() {
+                    const reduxRepo = this.props[PL(entityName)];
+                    repoShouldExist(reduxRepo, entityName, reducer_name);
+                }
+
                 // Sets up the query and makes the initial query
                 initialQuery = (url, params = {}) => {
                     this.setState({url});
@@ -46,15 +53,14 @@ export default (entityName, {resultField = RESULT_FIELD, hideLoadIfDataFound = t
                     this.setState({params: newParams, loadingData: true});
                     const dataExists = !!this.props[PL(entityName)][encodeAPICall(url, newParams)];
                     if (!dataExists || !hideLoadIfDataFound) this.props.freeze();
-                    return this.props.queryEntities(entityName, url, newParams)
+                    return this.props.queryEntities(entityName, url, newParams, resultField)
                         .then(() => {this.setState({loadingData: false});this.props.unfreeze();this.collectGarbage(url, newParams);})
                         .catch(() => {this.setState({loadingData: false, params: oldParams});this.props.unfreeze();});
                 };
 
                 // Checks whether initialQuery is called and url is known
                 checkSetup = () => {
-                    const { url } = this.state;
-                    if (!url) throw new Error(`No url specified for ${entityName}`);
+                    shouldExist(this.state.url, 'url');
                 };
 
                 // this entity does not contain id
