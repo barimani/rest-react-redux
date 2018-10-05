@@ -56,7 +56,7 @@ export const queryEntities = (entityName, url, params, hasData = false, setPrelo
                 dispatch(updateNetworkTimer(timeDiff, entityName))
             }
 
-            const payload = setPreloadFlag ? {...data, query, preloadedAt: new Date()} : {...data, query};
+            const payload = setPreloadFlag ? {data, query, preloadedAt: new Date()} : {data, query};
             dispatch(insertQuery(payload, entityName));
         });
     }

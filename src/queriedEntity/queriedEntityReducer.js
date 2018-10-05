@@ -39,11 +39,15 @@ export default entityName => (state = defaultState, action) => {
             const lastQueryData = state[lastQuery];
             if (!lastQueryData) return state;
             const {entity, resultField} = action.payload;
-            const newQueryData = lastQueryData[resultField].map(data => {
+            const content = resultField ? lastQueryData.data[resultField] : lastQueryData.data;
+            const newQueryData = content.map(data => {
                 if (entity.id === data.id) return entity;
                 return data;
             });
-            return {...state, [lastQuery]: {...lastQueryData, [resultField]: newQueryData}};
+            if (resultField)
+                return {...state, [lastQuery]: {...lastQueryData, data: {...lastQueryData.data, [resultField]: newQueryData}}};
+            else
+                return {...state, [lastQuery]: {...lastQueryData, data: newQueryData}};
         }
 
         case (types.PATCH_ENTITY(entityName)): {
@@ -55,12 +59,15 @@ export default entityName => (state = defaultState, action) => {
             if (!lastQueryData) return state;
 
             const {entity, resultField} = action.payload;
-            const newQueryData = lastQueryData.map(data => {
+            const content = resultField ? lastQueryData[resultField].data : lastQueryData.data;
+            const newQueryData = content.map(data => {
                 if (entity.id === newQueryData.id) return {...data, ...entity};
                 return data;
             });
-            return {...state, [lastQuery]: {...lastQueryData, [resultField]: newQueryData}};
-        }
+            if (resultField)
+                return {...state, [lastQuery]: {...lastQueryData, data: {...lastQueryData.data, [resultField]: newQueryData}}};
+            else
+                return {...state, [lastQuery]: {...lastQueryData, data: newQueryData}};        }
 
         case (types.DELETE_ENTITY(entityName)): {
             const { tracker } = state;
@@ -70,9 +77,12 @@ export default entityName => (state = defaultState, action) => {
             const lastQuery = tracker[tracker.length - 1];
             const lastQueryData = state[lastQuery];
             if (!lastQueryData) return state;
-
-            const newQueryData = lastQueryData[resultField].filter(data => entity.id !== data.id);
-            return {...state, [lastQuery]: {...lastQueryData, [resultField]: newQueryData}};
+            const content = resultField ? lastQueryData[resultField].data : lastQueryData.data;
+            const newQueryData = content.filter(data => entity.id !== data.id);
+            if (resultField)
+                return {...state, [lastQuery]: {...lastQueryData, data: {...lastQueryData.data, [resultField]: newQueryData}}};
+            else
+                return {...state, [lastQuery]: {...lastQueryData, data: newQueryData}};
         }
 
         default:

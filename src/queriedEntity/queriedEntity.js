@@ -168,7 +168,7 @@ export default (entityName, {resultField = RESULT_FIELD, hideLoadIfDataFound = t
                     if (resultField) delete queryMetadata[resultField];
                     const injectedProps = {
                         [PL(entityName) + 'QueryParams']: this.state.params,
-                        [PL(entityName)]: (resultField ? (queryData && queryData[resultField]) : queryData) || [],
+                        [PL(entityName)]: (resultField ? (queryData.data && queryData.data[resultField]) : queryData.data) || [],
                         [PL(entityName) + 'Metadata']: queryMetadata,
                         ['initialQuery' + CFL(PL(entityName))]: this.initialQuery,
                         ['query' + CFL(PL(entityName))]: this.query,
